@@ -29,7 +29,6 @@ async function getArticles(): Promise<{
   error: string | null;
 }> {
   try {
-    // Use absolute URL for server-side fetching
     const host = process.env.VERCEL_URL
       ? `https://${process.env.VERCEL_URL}`
       : "http://localhost:3000";

@@ -2,10 +2,10 @@ import { Pool } from "pg";
 import { NextResponse } from "next/server";
 
 const pool = new Pool({
-  host: "167.235.158.202",
-  database: "n8n",
-  user: "ZW8k1uNJDvYVQCxn",
-  password: "vVkByQq7nmx1rZ3hLs1w220MT35YStW4",
+  host: `${process.env.POSTGRES_HOST}`,
+  database: `${process.env.POSTGRES_DATABASE}`,
+  user: `${process.env.POSTGRES_USER}`,
+  password: `${process.env.POSTGRES_PASSWORD}`,
   port: 8001,
   ssl: false,
   max: 5,
@@ -22,12 +22,10 @@ export async function GET(request: Request) {
   const skipSampleData = url.searchParams.get("skipSampleData") === "true";
   const tableFilter = url.searchParams.get("tableFilter") || "";
 
-  // Handle specific case for rugpull_context table
   const isRugpullContextOnly = tableFilter
     .toLowerCase()
     .includes("rugpull_context");
 
-  // Create a timeout promise to abort long-running operations
   const timeout = new Promise((_, reject) =>
     setTimeout(
       () => reject(new Error("Database operation timed out")),
@@ -115,7 +113,7 @@ export async function GET(request: Request) {
             const samplePromise = skipSampleData
               ? Promise.resolve({ rows: [] })
               : client.query(
-                  `SELECT * FROM "${table.table_schema}"."${table.table_name}" WHERE rugpull_score > 1 OR rugpull_score IS NULL;`,
+                  `SELECT * FROM "${table.table_schema}"."${table.table_name}" WHERE red_flags IS NOT NULL;`,
                 );
 
             // Run queries in parallel for each table

@@ -2,10 +2,10 @@ import { Pool } from "pg";
 import { NextResponse } from "next/server";
 
 const pool = new Pool({
-  host: "167.235.158.202",
-  database: "n8n",
-  user: "ZW8k1uNJDvYVQCxn",
-  password: "vVkByQq7nmx1rZ3hLs1w220MT35YStW4",
+  host: `${process.env.POSTGRES_HOST}`,
+  database: `${process.env.POSTGRES_DATABASE}`,
+  user: `${process.env.POSTGRES_USER}`,
+  password: `${process.env.POSTGRES_PASSWORD}`,
   port: 8001,
   ssl: false,
 });
