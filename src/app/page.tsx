@@ -29,12 +29,16 @@ async function getArticles(): Promise<{
   error: string | null;
 }> {
   try {
-    const host = process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}`
-      : "http://localhost:3000";
+    const baseUrl =
+      process.env.NEXT_PUBLIC_API_BASE_URL ||
+      (process.env.VERCEL_URL
+        ? `https://${process.env.VERCEL_URL}`
+        : process.env.NODE_ENV === "development"
+          ? "http://localhost:3000"
+          : "https://rugpullnews.org");
 
     const response = await fetch(
-      `${host}/api/all-articles?tableFilter=rugpull_context`,
+      `${baseUrl}/api/all-articles?tableFilter=rugpull_context`,
       { cache: "no-store" },
     );
     const data = (await response.json()) as ArticleResponse;
