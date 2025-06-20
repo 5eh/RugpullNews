@@ -45,7 +45,6 @@ async function getArticleData(
   id: string,
 ): Promise<ProcessedArticleData | null> {
   try {
-    // In development, use localhost, otherwise use production URL
     const isLocalDev = process.env.NODE_ENV === "development";
     const apiUrl = isLocalDev
       ? `http://localhost:3000/api/get-article?id=${id}`
@@ -65,10 +64,8 @@ async function getArticleData(
       throw new Error(`Failed to fetch article data: ${response.status}`);
     }
 
-    // Check content type to ensure we're getting JSON
     const contentType = response.headers.get("content-type");
     if (!contentType || !contentType.includes("application/json")) {
-      // If not JSON, log the actual response text for debugging
       const text = await response.text();
       console.error(
         "API returned non-JSON response:",
@@ -86,7 +83,6 @@ async function getArticleData(
       throw new Error("Article data not found");
     }
 
-    // Process the article data to match our component needs
     const rawArticle: ArticleData = data.article;
 
     // Parse red flags from string to array

@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import Loading from "./components/loading";
-import Image from "next/image";
+import ArticleCard from "./components/ArticleCard";
 
 interface Article {
   id: number;
@@ -72,16 +72,10 @@ async function getArticles(): Promise<{
 export default async function Home() {
   const { articles, error } = await getArticles();
 
-  const formatDate = (isoDate: string) => {
-    return new Date(isoDate).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
-  };
-
   return (
-    <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
+    <main className=" mx-auto px-4 py-6">
+      <h1 className="sr-only">Rugpull News - Crypto Scam Analysis</h1>
+
       <Suspense
         fallback={
           <div className="flex justify-center items-center py-20">
@@ -90,7 +84,7 @@ export default async function Home() {
         }
       >
         {error && (
-          <div className="bg-red-900/20 border border-red-500/20 rounded-md p-4 mb-6">
+          <div className="border border-red-500/20 rounded-md p-4 mb-6 hover:bg-gray-600/20">
             <div className="text-red-400">
               <h3 className="font-medium">Error Loading Articles</h3>
               <p className="mt-1 text-sm">{error}</p>
@@ -98,60 +92,84 @@ export default async function Home() {
           </div>
         )}
 
-        {articles.map((article) => (
-          <div
-            key={article.id}
-            className="group cursor-pointer grayscale hover:grayscale-0 transition-all duration-300 border-b border-gray-700/30 pb-6"
-          >
-            {/* Article Image */}
-            <div className="aspect-video bg-gray-700/40 overflow-hidden rounded-sm mb-4 relative">
-              <Image
-                src={
-                  article.banner_image ||
-                  `https://www.ccn.com/wp-content/uploads/2025/03/pi-network-pi-clings-to-1-support-but-faces-pressure-ahead-of-mainnet-migration-deadline.webp`
-                }
-                alt={article.title}
-                fill
-                sizes="(max-width: 768px) 100vw, 768px"
-                style={{ objectFit: "cover" }}
-                className="transition-all duration-300"
-              />
-            </div>
-
-            <div className="space-y-3">
-              <div className="text-xs text-gray-400  tracking-wide">
-                {article.creator || "ANON"} • {formatDate(article.isodate)}
+        {articles.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-4 md:grid-rows-6 gap-4">
+            {/* Featured Article - Position 1 */}
+            {articles.length > 0 && (
+              <div className="col-span-full md:col-span-2 md:row-span-2">
+                <ArticleCard article={articles[0]} featured={true} />
               </div>
-              <h3 className="text-lg font-title text-white leading-tight group-hover:text-[#d6973e] transition-colors duration-300">
-                {article.title}
-              </h3>
+            )}
 
-              {/* Description */}
-              <p className="text-sm font-subtitle text-gray-300 leading-relaxed">
-                {article.contentsnippet}
-              </p>
-
-              {/* Action Buttons */}
-              <div className="flex font-content gap-4 pt-2">
-                <a
-                  href={article.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-gray-400 hover:text-gray-200 transition-colors duration-300"
-                >
-                  Original Article
-                </a>
-                <a
-                  href={`/${article.id}`}
-                  className="text-sm font-title text-[#d6973e] hover:text-[#d68b36] transition-colors duration-300 font-medium"
-                >
-                  Our Report
-                </a>
+            {/* Position 2 */}
+            {articles.length > 1 && (
+              <div className="col-span-full md:col-span-1 md:col-start-1 md:row-start-3 md:row-span-2">
+                <ArticleCard article={articles[1]} />
               </div>
-            </div>
+            )}
+
+            {/* Position 3 */}
+            {articles.length > 2 && (
+              <div className="col-span-full md:col-span-1 md:col-start-3 md:row-start-1 md:row-span-3">
+                <ArticleCard article={articles[2]} />
+              </div>
+            )}
+
+            {/* Position 4 */}
+            {articles.length > 3 && (
+              <div className="col-span-full md:col-span-1 md:col-start-2 md:row-start-3 md:row-span-2">
+                <ArticleCard article={articles[3]} />
+              </div>
+            )}
+
+            {/* Position 5 */}
+            {articles.length > 4 && (
+              <div className="col-span-full md:col-span-1 md:col-start-1 md:row-start-5 md:row-span-2">
+                <ArticleCard article={articles[4]} />
+              </div>
+            )}
+
+            {/* Position 6 */}
+            {articles.length > 5 && (
+              <div className="col-span-full md:col-span-1 md:col-start-2 md:row-start-5 md:row-span-2">
+                <ArticleCard article={articles[5]} />
+              </div>
+            )}
+
+            {/* Position 7 */}
+            {articles.length > 6 && (
+              <div className="col-span-full md:col-span-1 md:col-start-3 md:row-start-4 md:row-span-3">
+                <ArticleCard article={articles[6]} />
+              </div>
+            )}
+
+            {/* Loop through remaining articles in 3-column layout, skipping the ad column */}
+            {articles.length > 7 && (
+              <div className="col-span-full md:col-span-3 mt-8">
+                <h2 className="text-xl font-bold text-white mb-6 font-title border-b border-gray-700/50 pb-2">
+                  More Stories
+                </h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                  {articles.slice(7).map((article) => (
+                    <ArticleCard key={article.id} article={article} />
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
-        ))}
+        )}
+
+        {articles.length === 0 && !error && (
+          <div className="border border-gray-700/30 rounded-lg p-8 text-center hover:bg-gray-600/20">
+            <h2 className="text-xl font-medium text-gray-300">
+              No articles available
+            </h2>
+            <p className="text-gray-400 mt-2">
+              Check back soon for the latest news
+            </p>
+          </div>
+        )}
       </Suspense>
-    </div>
+    </main>
   );
 }

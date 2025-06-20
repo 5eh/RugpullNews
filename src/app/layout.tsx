@@ -25,7 +25,7 @@ const noto_sans_jp = Noto_Sans_JP({
 export const metadata: Metadata = {
   title: "Rugpull News",
   description:
-    "An RSS Generation feed of live rug pull news, and related materials. Sponsored by Arthur Labs.",
+    "Get yourself educated on Web3 scams, let's make this wild west safer. Sponsored by Arthur Labs.",
 };
 
 export default function RootLayout({

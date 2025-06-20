@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -66,20 +65,25 @@ const Navigation = () => {
         <div className="max-w-7xl mx-auto px-4 py-6">
           {/* Center Logo */}
           <div className="flex items-center justify-center mb-4 gap-8">
-            <Link href="/">
+            {/* <Link href="/">
               <Image
                 src={"/Rugpull.png"}
                 alt="Rugpull news | An Arthur Labs ecosystem project."
                 height={64}
                 width={64}
               />
-            </Link>
-            <Link
-              href="/"
-              className="text-3xl font-bold font-title text-white hover:text-[#d6973e] transition-colors duration-300"
-            >
-              RugPull News
-            </Link>
+            </Link> */}
+            <div className="">
+              <Link
+                href="/"
+                className="text-6xl font-bold font-title text-white hover:text-[#d6973e] transition-colors duration-300"
+              >
+                RUGPULL news
+              </Link>
+              <p className="w-full text-center text-[#d6973e] mt-2">
+                Helping you not get rugged.
+              </p>
+            </div>
           </div>
 
           {/* Navigation Links with Search, Subscribe, Donate */}
