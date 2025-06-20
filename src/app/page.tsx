@@ -29,30 +29,42 @@ async function getArticles(): Promise<{
   error: string | null;
 }> {
   try {
-    const baseUrl =
-      process.env.NEXT_PUBLIC_API_BASE_URL ||
-      (process.env.VERCEL_URL
-        ? `https://${process.env.VERCEL_URL}`
-        : process.env.NODE_ENV === "development"
-          ? "http://localhost:3000"
-          : "https://rugpullnews.org");
+    // In development, use localhost, otherwise use production URL
+    const isLocalDev = process.env.NODE_ENV === "development";
+    const apiUrl = isLocalDev
+      ? "http://localhost:3000/api/all-articles?tableFilter=rugpull_context"
+      : "https://rugpullnews.org/api/all-articles?tableFilter=rugpull_context";
 
-    const response = await fetch(
-      `${baseUrl}/api/all-articles?tableFilter=rugpull_context`,
-      { cache: "no-store" },
-    );
-    const data = (await response.json()) as ArticleResponse;
+    console.log("Fetching articles from:", apiUrl);
 
-    if (data.success && data.tables && data.tables[0]?.sampleData) {
-      return { articles: data.tables[0].sampleData, error: null };
-    } else {
-      return { articles: [], error: "No articles found" };
+    const response = await fetch(apiUrl, {
+      cache: "no-store",
+      headers: {
+        Accept: "application/json",
+      },
+    });
+
+    try {
+      const data = (await response.json()) as ArticleResponse;
+
+      if (data.success && data.tables && data.tables[0]?.sampleData) {
+        return { articles: data.tables[0].sampleData, error: null };
+      } else {
+        console.warn("API returned success=false or missing data:", data);
+        return { articles: [], error: "No articles found in API response" };
+      }
+    } catch (jsonError) {
+      console.error("Failed to parse JSON response:", jsonError);
+      return {
+        articles: [],
+        error: "Failed to parse API response data",
+      };
     }
   } catch (err) {
     console.error("Error fetching articles:", err);
     return {
       articles: [],
-      error: err instanceof Error ? err.message : "Unknown error occurred",
+      error: "Failed to fetch articles. Please try again later.",
     };
   }
 }
