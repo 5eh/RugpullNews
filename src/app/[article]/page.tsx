@@ -45,21 +45,44 @@ async function getArticleData(
   id: string,
 ): Promise<ProcessedArticleData | null> {
   try {
-    const host = process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}`
-      : "http://localhost:3000";
+    // In development, use localhost, otherwise use production URL
+    const isLocalDev = process.env.NODE_ENV === "development";
+    const apiUrl = isLocalDev
+      ? `http://localhost:3000/api/get-article?id=${id}`
+      : `https://rugpullnews.org/api/get-article?id=${id}`;
 
-    const response = await fetch(`${host}/api/get-article?id=${id}`, {
+    console.log("Fetching article data from:", apiUrl);
+
+    const response = await fetch(apiUrl, {
       cache: "no-store",
+      headers: {
+        Accept: "application/json",
+      },
     });
 
     if (!response.ok) {
-      throw new Error("Failed to fetch article data");
+      console.error(`API error: ${response.status} ${response.statusText}`);
+      throw new Error(`Failed to fetch article data: ${response.status}`);
+    }
+
+    // Check content type to ensure we're getting JSON
+    const contentType = response.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      // If not JSON, log the actual response text for debugging
+      const text = await response.text();
+      console.error(
+        "API returned non-JSON response:",
+        text.substring(0, 500) + "...",
+      );
+      throw new Error(
+        `API returned non-JSON response (${contentType || "unknown content type"})`,
+      );
     }
 
     const data = await response.json();
 
     if (!data.success || !data.article) {
+      console.warn("API returned success=false or missing article data:", data);
       throw new Error("Article data not found");
     }
 
@@ -89,6 +112,10 @@ async function getArticleData(
     };
   } catch (err) {
     console.error("Error fetching article:", err);
+    console.error(
+      "Error details:",
+      err instanceof Error ? err.message : String(err),
+    );
     return null;
   }
 }
