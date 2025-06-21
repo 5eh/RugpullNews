@@ -26,6 +26,7 @@ const Navigation = () => {
   const [isEducationOpen, setIsEducationOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
   interface Article {
     id: string;
     title: string;
@@ -222,7 +223,7 @@ const Navigation = () => {
                     {article.rugpull_score && article.rugpull_score > 7 ? (
                       <span className="mr-1">🚨</span>
                     ) : article.red_flags ? (
-                      <span className="mr-1">⚠️</span>
+                      <span className="mr-1"></span>
                     ) : article.project_type &&
                       article.project_type.toLowerCase().includes("coin") ? (
                       <span className="mr-1">💰</span>
@@ -412,19 +413,19 @@ const Navigation = () => {
                 <div className="absolute right-0 mt-2 w-64 backdrop-blur-2xl border border-gray-600/30 rounded-sm shadow-lg z-50">
                   <div className="py-2">
                     <Link
-                      href="/education/get-out-of-scam"
+                      href="/education/exit-scams"
                       className="block px-4 py-2 text-sm text-gray-300 hover:text-white hover:bg-[#d6973e] transition-colors duration-300"
                     >
                       1. How to get out of a scam
                     </Link>
                     <Link
-                      href="/education/identify-scam"
+                      href="/education/identify-scams"
                       className="block px-4 py-2 text-sm text-gray-300 hover:text-white hover:bg-[#d6973e] transition-colors duration-300"
                     >
                       2. How to identify a scam
                     </Link>
                     <Link
-                      href="/education/legal-report"
+                      href="/education/report-scams"
                       className="block px-4 py-2 text-sm text-gray-300 hover:text-white hover:bg-[#d6973e] transition-colors duration-300"
                     >
                       3. File a legal report

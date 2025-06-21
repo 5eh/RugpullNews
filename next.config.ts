@@ -1,5 +1,5 @@
-// next.config.js
 /** @type {import('next').NextConfig} */
+
 const nextConfig = {
   images: {
     remotePatterns: [
@@ -8,6 +8,12 @@ const nextConfig = {
         hostname: "d8g0w48ggskw4go8k44gwo88.167.235.158.202.sslip.io",
         port: "",
         pathname: "/images/**",
+      },
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+        port: "",
+        pathname: "/**",
       },
     ],
   },
