@@ -48,12 +48,14 @@ const getRiskLevelClass = (level?: string): string => {
 interface ArticleCardProps {
   article: Article;
   featured?: boolean;
+  doubleHeight?: boolean;
   className?: string;
 }
 
 export default function ArticleCard({
   article,
   featured = false,
+  doubleHeight = false,
   className = "",
 }: ArticleCardProps) {
   const handleOriginalLinkClick = (e: React.MouseEvent) => {
@@ -63,11 +65,15 @@ export default function ArticleCard({
   return (
     <Link href={`/${article.id}`} className="block h-full">
       <div
-        className={`group h-full flex flex-col grayscale hover:grayscale-0 transition-all duration-300 hover:bg-gray-600/20 rounded-lg overflow-hidden border border-gray-700/30 ${className}`}
+        className={`group h-full flex flex-col grayscale hover:grayscale-0 transition-all duration-300 hover:bg-gray-600/20 rounded-t-md overflow-hidden border border-gray-700/30 ${className}`}
       >
         <div
           className={`${
-            featured ? "h-72 sm:h-96" : "h-56"
+            featured
+              ? "h-72 sm:h-96"
+              : doubleHeight
+                ? "h-96 sm:h-[28rem]"
+                : "h-96"
           } w-full overflow-hidden relative`}
         >
           <Image
@@ -79,7 +85,7 @@ export default function ArticleCard({
             fill
             sizes={
               featured
-                ? "(max-width: 768px) 100vw, 50vw"
+                ? "(max-width: 768px) 100vw, 66vw"
                 : "(max-width: 768px) 100vw, 33vw"
             }
             style={{ objectFit: "cover", objectPosition: "center" }}
@@ -100,13 +106,13 @@ export default function ArticleCard({
           </div>
           <h3
             className={`${
-              featured ? "text-xl" : "text-base"
+              featured ? "text-3xl" : "text-xl"
             } font-bold font-title text-white leading-tight group-hover:text-[#d6973e] transition-colors duration-300`}
           >
             {article.title}
           </h3>
 
-          <p className="text-sm font-subtitle text-gray-300 leading-relaxed line-clamp-1">
+          <p className="text-lg font-subtitle text-gray-300 leading-relaxed line-clamp-4">
             {article.contentsnippet}
           </p>
 
@@ -116,11 +122,11 @@ export default function ArticleCard({
               target="_blank"
               rel="noopener noreferrer"
               onClick={handleOriginalLinkClick}
-              className="text-xs text-gray-400 hover:text-gray-200 transition-colors duration-300"
+              className="text-xl text-gray-400 hover:text-gray-200 transition-colors duration-300"
             >
               Original
             </a>
-            <span className="text-xs font-title text-[#d6973e] hover:text-[#d68b36] transition-colors duration-300 font-medium">
+            <span className="text-2xl font-title text-[#d6973e] hover:text-[#d68b36] transition-colors duration-300 font-medium">
               Our Report
             </span>
           </div>

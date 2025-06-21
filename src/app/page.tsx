@@ -94,7 +94,6 @@ export default async function Home() {
 
         {articles.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-4 md:grid-rows-6 gap-4">
-            {/* Featured Article - Position 1 */}
             {articles.length > 0 && (
               <div className="col-span-full md:col-span-2 md:row-span-2">
                 <ArticleCard article={articles[0]} featured={true} />
@@ -104,42 +103,42 @@ export default async function Home() {
             {/* Position 2 */}
             {articles.length > 1 && (
               <div className="col-span-full md:col-span-1 md:col-start-1 md:row-start-3 md:row-span-2">
-                <ArticleCard article={articles[1]} />
+                <ArticleCard article={articles[1]} doubleHeight={true} />
               </div>
             )}
 
             {/* Position 3 */}
             {articles.length > 2 && (
               <div className="col-span-full md:col-span-1 md:col-start-3 md:row-start-1 md:row-span-3">
-                <ArticleCard article={articles[2]} />
+                <ArticleCard article={articles[2]} doubleHeight={true} />
               </div>
             )}
 
             {/* Position 4 */}
             {articles.length > 3 && (
               <div className="col-span-full md:col-span-1 md:col-start-2 md:row-start-3 md:row-span-2">
-                <ArticleCard article={articles[3]} />
+                <ArticleCard article={articles[3]} doubleHeight={true} />
               </div>
             )}
 
             {/* Position 5 */}
             {articles.length > 4 && (
               <div className="col-span-full md:col-span-1 md:col-start-1 md:row-start-5 md:row-span-2">
-                <ArticleCard article={articles[4]} />
+                <ArticleCard article={articles[4]} doubleHeight={true} />
               </div>
             )}
 
             {/* Position 6 */}
             {articles.length > 5 && (
               <div className="col-span-full md:col-span-1 md:col-start-2 md:row-start-5 md:row-span-2">
-                <ArticleCard article={articles[5]} />
+                <ArticleCard article={articles[5]} doubleHeight={true} />
               </div>
             )}
 
             {/* Position 7 */}
             {articles.length > 6 && (
               <div className="col-span-full md:col-span-1 md:col-start-3 md:row-start-4 md:row-span-3">
-                <ArticleCard article={articles[6]} />
+                <ArticleCard article={articles[6]} doubleHeight={true} />
               </div>
             )}
 
