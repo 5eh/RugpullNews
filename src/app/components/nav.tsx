@@ -4,6 +4,24 @@ import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
 import React from "react";
 
+// Crypto price interfaces
+interface CoinPrice {
+  symbol: string;
+  name: string;
+  price: number;
+  change24h: number;
+  color: "green" | "red";
+  formattedPrice: string;
+  formattedChange: string;
+}
+
+interface ApiResponse {
+  success: boolean;
+  data?: CoinPrice[];
+  error?: string;
+  timestamp: string;
+}
+
 const Navigation = () => {
   const [isEducationOpen, setIsEducationOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -18,8 +36,29 @@ const Navigation = () => {
 
   const [articles, setArticles] = useState<Article[]>([]);
   const [hoveredArticleId, setHoveredArticleId] = useState<string | null>(null);
+  const [cryptoPrices, setCryptoPrices] = useState<CoinPrice[]>([]);
+  const [cryptoLoading, setCryptoLoading] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
+
+  // Function to fetch crypto prices from our API
+  const fetchCryptoPrices = async () => {
+    try {
+      setCryptoLoading(true);
+      const response = await fetch("/api/get-prices");
+      const data: ApiResponse = await response.json();
+
+      if (data.success && data.data) {
+        setCryptoPrices(data.data);
+      } else {
+        console.error("Error fetching crypto prices:", data.error);
+      }
+    } catch (error) {
+      console.error("Failed to fetch crypto prices:", error);
+    } finally {
+      setCryptoLoading(false);
+    }
+  };
 
   // Calculate animation duration based on number of articles
   const getAnimationDuration = React.useCallback((): string => {
@@ -58,8 +97,20 @@ const Navigation = () => {
   }, [isMobileMenuOpen]);
 
   // Fetch articles from API
+  // Fetch crypto prices when component mounts
   useEffect(() => {
-    const fetchArticles = async (): Promise<void> => {
+    fetchCryptoPrices();
+
+    // Refresh prices every 60 seconds
+    const interval = setInterval(() => {
+      fetchCryptoPrices();
+    }, 60000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const fetchArticles = async () => {
       try {
         setIsLoading(true);
         setFetchError(null);
@@ -162,7 +213,7 @@ const Navigation = () => {
               articles.map((article, index) => (
                 <React.Fragment key={article.id || index}>
                   <Link
-                    href={`/article?id=${article.id}`}
+                    href={`/${article.id}`}
                     className={`group flex items-center cursor-pointer transition-colors ${hoveredArticleId === article.id ? "text-[#d6973e]" : ""}`}
                     onMouseEnter={() => setHoveredArticleId(article.id)}
                     onMouseLeave={() => setHoveredArticleId(null)}
@@ -173,7 +224,7 @@ const Navigation = () => {
                     ) : article.red_flags ? (
                       <span className="mr-1">⚠️</span>
                     ) : article.project_type &&
-                      article.project_type.toLowerCase().includes("defi") ? (
+                      article.project_type.toLowerCase().includes("coin") ? (
                       <span className="mr-1">💰</span>
                     ) : article.project_type &&
                       article.project_type.toLowerCase().includes("nft") ? (
@@ -204,23 +255,33 @@ const Navigation = () => {
         </div>
       </div>
 
-      {/* Static Ticker Map - Hidden on mobile */}
       <div className="border-b border-gray-700/30 overflow-x-auto hidden md:block">
         <div className="max-w-7xl mx-auto px-4 py-3">
           <div className="flex flex-wrap md:flex-nowrap items-center justify-between text-xs text-gray-400">
             <div className="flex items-center space-x-3 md:space-x-6 mb-2 md:mb-0">
-              <span>
-                BTC: <span className="text-red-400">$42,156 ↓2.3%</span>
-              </span>
-              <span>
-                ETH: <span className="text-green-400">$2,847 ↑1.8%</span>
-              </span>
-              <span>
-                SOL: <span className="text-red-400">$98.45 ↓0.7%</span>
-              </span>
-              <span>
-                DOGE: <span className="text-green-400">$0.087 ↑4.2%</span>
-              </span>
+              {["BTC", "ETH", "DOT", "DOGE"].map((symbol) => {
+                if (cryptoLoading) {
+                  return (
+                    <span key={symbol}>
+                      {symbol}: <span className="text-gray-400">N/A</span>
+                    </span>
+                  );
+                }
+
+                const coin = cryptoPrices.find((c) => c.symbol === symbol);
+                return coin ? (
+                  <span key={coin.symbol}>
+                    {coin.symbol}:{" "}
+                    <span className={`text-${coin.color}-400`}>
+                      {coin.formattedPrice} {coin.formattedChange}
+                    </span>
+                  </span>
+                ) : (
+                  <span key={symbol}>
+                    {symbol}: <span className="text-gray-400">N/A</span>
+                  </span>
+                );
+              })}
             </div>
             <div className="flex items-center space-x-3 md:space-x-6">
               <span>
@@ -517,44 +578,8 @@ const Navigation = () => {
         }
       `}</style>
 
-      {/* Mobile Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-black/90 border-t border-gray-700/40 backdrop-blur-lg z-50 lg:hidden">
+      <div className="fixed bottom-0 left-0 right-0 backdrop-blur-3xl border-t border-gray-700/40  z-10 lg:hidden">
         <div className="flex items-center justify-around px-2 py-3">
-          <Link href="/" className="flex flex-col items-center space-y-1">
-            <svg
-              className="h-6 w-6 text-gray-300"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-              />
-            </svg>
-            <span className="text-xs text-gray-300">Home</span>
-          </Link>
-
-          <Link href="/safety" className="flex flex-col items-center space-y-1">
-            <svg
-              className="h-6 w-6 text-gray-300"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-              />
-            </svg>
-            <span className="text-xs text-gray-300">Safety</span>
-          </Link>
-
-          {/* Central Menu Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className="flex flex-col items-center justify-center -mt-8 bg-[#d68b36] hover:bg-[#d68b36]/80 text-white rounded-full h-16 w-16 shadow-lg transition-colors duration-300"
@@ -574,7 +599,6 @@ const Navigation = () => {
                     d="M6 18L18 6M6 6l12 12"
                   />
                 </svg>
-                <span className="text-xs mt-1">Close</span>
               </>
             ) : (
               <>
@@ -591,50 +615,9 @@ const Navigation = () => {
                     d="M4 6h16M4 12h16m-7 6h7"
                   />
                 </svg>
-                <span className="text-xs mt-1">Menu</span>
               </>
             )}
           </button>
-
-          <Link
-            href="/content"
-            className="flex flex-col items-center space-y-1"
-          >
-            <svg
-              className="h-6 w-6 text-gray-300"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"
-              />
-            </svg>
-            <span className="text-xs text-gray-300">Content</span>
-          </Link>
-
-          <Link
-            href="/whistleblowing"
-            className="flex flex-col items-center space-y-1"
-          >
-            <svg
-              className="h-6 w-6 text-gray-300"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            <span className="text-xs text-gray-300">Report</span>
-          </Link>
         </div>
       </div>
     </div>

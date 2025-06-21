@@ -84,10 +84,9 @@ export default async function Home() {
         }
       >
         {error && (
-          <div className="border border-red-500/20 rounded-md p-4 mb-6 hover:bg-gray-600/20">
+          <div className="p-4 mb-6">
             <div className="text-red-400">
-              <h3 className="font-medium">Error Loading Articles</h3>
-              <p className="mt-1 text-sm">{error}</p>
+              <Loading />
             </div>
           </div>
         )}
