@@ -2,22 +2,42 @@
 
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
+import React from "react";
 
 const Navigation = () => {
   const [isEducationOpen, setIsEducationOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  interface Article {
+    id: string;
+    title: string;
+    red_flags?: string | null;
+    rugpull_score?: number | null;
+    project_type?: string | null;
+  }
+
+  const [articles, setArticles] = useState<Article[]>([]);
+  const [hoveredArticleId, setHoveredArticleId] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
+
+  // Calculate animation duration based on number of articles
+  const getAnimationDuration = React.useCallback((): string => {
+    if (articles.length > 5) return "120s";
+    if (articles.length > 3) return "90s";
+    return "60s";
+  }, [articles.length]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
+    const handleClickOutside = (event: MouseEvent): void => {
       if (
         dropdownRef.current &&
         !dropdownRef.current.contains(event.target as Node)
       ) {
         setIsEducationOpen(false);
       }
-    }
+    };
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
@@ -27,7 +47,7 @@ const Navigation = () => {
 
   // Close mobile menu on window resize
   useEffect(() => {
-    const handleResize = () => {
+    const handleResize = (): void => {
       if (window.innerWidth >= 1024 && isMobileMenuOpen) {
         setIsMobileMenuOpen(false);
       }
@@ -37,22 +57,149 @@ const Navigation = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, [isMobileMenuOpen]);
 
+  // Fetch articles from API
+  useEffect(() => {
+    const fetchArticles = async (): Promise<void> => {
+      try {
+        setIsLoading(true);
+        setFetchError(null);
+        const response = await fetch(
+          "/api/all-articles?tableFilter=rugpull_context&skipRowCount=true",
+        );
+        const data = await response.json();
+
+        if (data.success && data.tables && data.tables.length > 0) {
+          // Find the rugpull_context table
+          const rugpullTable = data.tables.find((table: { name: string }) =>
+            table.name.toLowerCase().includes("rugpull_context"),
+          );
+
+          if (rugpullTable && rugpullTable.sampleData) {
+            // Define the type for raw article data from API
+            interface RawArticleData {
+              id: string | number;
+              title: string;
+              red_flags?: string | null;
+              rugpull_score?: number | null;
+              project_type?: string | null;
+              [key: string]: unknown;
+            }
+
+            // Filter out articles without titles and IDs
+            const validArticles = rugpullTable.sampleData
+              .filter((article: RawArticleData) => article.id && article.title)
+              .map(
+                (article: RawArticleData): Article => ({
+                  id: String(article.id),
+                  title: String(article.title),
+                  red_flags: article.red_flags || null,
+                  rugpull_score:
+                    typeof article.rugpull_score === "number"
+                      ? article.rugpull_score
+                      : null,
+                  project_type: article.project_type || null,
+                }),
+              )
+              .slice(0, 10); // Limit to 10 articles for performance
+
+            setArticles(validArticles);
+          } else {
+            setFetchError("No article data available");
+          }
+        } else {
+          setFetchError(data.error || "Failed to retrieve articles");
+        }
+      } catch (error) {
+        console.error("Failed to fetch articles:", error);
+        setFetchError("Network error while fetching articles");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchArticles();
+  }, []);
+
   return (
     <div>
-      {/* Ticker Tracker */}
+      {/* Ticker Tracker - Dynamic Articles */}
       <div className="border-b border-gray-700/30 overflow-hidden">
         <div className="whitespace-nowrap animate-scroll">
           <div className="inline-flex items-center space-x-8 px-4 py-2 text-sm text-gray-300">
-            <span>🚨 BREAKING: New DeFi protocol exploited for $12M</span>
-            <span>•</span>
-            <span>⚠️ Pi Network under investigation by SEC</span>
-            <span>•</span>
-            <span>📊 Rug pulls up 340% this quarter</span>
-            <span>•</span>
-            <span>🔍 SafeMoon founders charged with fraud</span>
-            <span>•</span>
-            <span>💰 $2.1B lost to crypto scams in 2024</span>
-            <span>•</span>
+            {isLoading ? (
+              <>
+                <span className="flex items-center justify-center">
+                  <svg
+                    className="animate-spin -ml-1 mr-2 h-4 w-4 text-[#d6973e]"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  Loading latest articles...
+                </span>
+                <span>•</span>
+              </>
+            ) : fetchError ? (
+              <>
+                <span className="text-red-400">⚠️ {fetchError}</span>
+                <span>•</span>
+              </>
+            ) : articles.length > 0 ? (
+              articles.map((article, index) => (
+                <React.Fragment key={article.id || index}>
+                  <Link
+                    href={`/article?id=${article.id}`}
+                    className={`group flex items-center cursor-pointer transition-colors ${hoveredArticleId === article.id ? "text-[#d6973e]" : ""}`}
+                    onMouseEnter={() => setHoveredArticleId(article.id)}
+                    onMouseLeave={() => setHoveredArticleId(null)}
+                  >
+                    {/* Icon based on article type or score */}
+                    {article.rugpull_score && article.rugpull_score > 7 ? (
+                      <span className="mr-1">🚨</span>
+                    ) : article.red_flags ? (
+                      <span className="mr-1">⚠️</span>
+                    ) : article.project_type &&
+                      article.project_type.toLowerCase().includes("defi") ? (
+                      <span className="mr-1">💰</span>
+                    ) : article.project_type &&
+                      article.project_type.toLowerCase().includes("nft") ? (
+                      <span className="mr-1">🖼️</span>
+                    ) : (
+                      <span className="mr-1">📰</span>
+                    )}
+                    <span className="group-hover:underline">
+                      {article.title.length > 60
+                        ? `${article.title.substring(0, 57)}...`
+                        : article.title}
+                    </span>
+                  </Link>
+                  {index < articles.length - 1 && <span>•</span>}
+                </React.Fragment>
+              ))
+            ) : (
+              <>
+                <span>🚨 BREAKING: New DeFi protocol exploited for $12M</span>
+                <span>•</span>
+                <span>⚠️ Pi Network under investigation by SEC</span>
+                <span>•</span>
+                <span>📊 Rug pulls up 340% this quarter</span>
+                <span>•</span>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -299,6 +446,13 @@ const Navigation = () => {
                 >
                   Arthur Labs
                 </Link>
+
+                {/* Dynamic Articles Section */}
+                <div className="border-t border-gray-700/30 pt-4 mt-2">
+                  <h4 className="px-4 text-sm font-medium text-white mb-2">
+                    Latest Articles
+                  </h4>
+                </div>
                 <Link
                   href="/sponsors"
                   className="text-sm text-gray-300 hover:text-white transition-colors duration-300 py-2 px-4 hover:bg-gray-800/30 rounded-sm"
@@ -382,11 +536,14 @@ const Navigation = () => {
             transform: translateX(100%);
           }
           100% {
-            transform: translateX(-100%);
+            transform: translateX(-200%);
           }
         }
         .animate-scroll {
-          animation: scroll 60s linear infinite;
+          animation: scroll ${getAnimationDuration()} linear infinite;
+        }
+        .animate-scroll:hover {
+          animation-play-state: paused;
         }
       `}</style>
     </div>

@@ -19,7 +19,6 @@ interface Article {
   rugpull_score?: number;
 }
 
-// Format date function
 const formatDate = (isoDate: string) => {
   return new Date(isoDate).toLocaleDateString("en-US", {
     year: "numeric",
@@ -60,7 +59,7 @@ export default function ArticleCard({
 }: ArticleCardProps) {
   return (
     <div
-      className={`group h-full flex flex-col grayscale hover:grayscale-0 transition-all duration-300 hover:bg-gray-600/20 rounded-lg overflow-hidden border border-gray-700/30 ${className}`}
+      className={`group h-full flex flex-col grayscale hover:grayscale-0 transition-all duration-300 hover:bg-gray-500/5 hover:border-gray-500/20  rounded-lg overflow-hidden border border-gray-700/30 ${className}`}
     >
       {/* Image with link */}
       <Link href={`/${article.id}`} className="block">

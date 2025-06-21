@@ -241,7 +241,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
         <div className="grid md:grid-cols-3 gap-6 md:gap-12">
           {/* Main Content */}
           <div className="md:col-span-2">
-            <div className="bg-gray-500/20 rounded-lg p-4 md:p-8 mb-8">
+            <div className="bg-gray-500/5 border-gray-500/20 border rounded-lg p-4 md:p-8 mb-8">
               <h2 className="text-xl md:text-2xl font-semibold font-subtitle text-white mb-4 md:mb-6">
                 Our Analysis
               </h2>
@@ -261,7 +261,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
 
             {/* Red Flags */}
             {articleData.redFlags && articleData.redFlags.length > 0 && (
-              <div className="bg-gray-500/20 rounded-lg p-4 md:p-8">
+              <div className="bg-gray-500/5 border-gray-500/20 border rounded-lg p-4 md:p-8">
                 <h3 className="text-xl font-semibold text-white mb-4 md:mb-6 flex items-center">
                   <span className="text-red-400 mr-2">🚩</span> Red Flags
                   Identified
@@ -285,7 +285,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           {/* Sidebar */}
           <div className="space-y-6 md:space-y-8 sticky top-4">
             {/* Rug Pull Score */}
-            <div className="bg-gray-500/20 rounded-lg p-4 md:p-8">
+            <div className="bg-gray-500/5 border-gray-500/20 border rounded-lg p-4 md:p-8">
               <h3 className="text-lg md:text-xl font-semibold text-white mb-4 md:mb-6">
                 Rug Pull Score
               </h3>
@@ -307,19 +307,19 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
             </div>
 
             {/* Quick Actions */}
-            <div className="bg-gray-500/20 rounded-lg p-4 md:p-8">
+            <div className="bg-gray-500/5 border-gray-500/20 border rounded-lg p-4 md:p-8">
               <h3 className="text-lg md:text-xl font-semibold text-white mb-4 md:mb-6">
                 Quick Actions
               </h3>
               <div className="space-y-3 md:space-y-4">
-                <button className="w-full bg-[#05A8DC] hover:bg-[#0494C7] text-white py-3 md:py-4 px-4 md:px-6 rounded-sm text-base md:text-lg font-medium transition-all duration-300">
-                  Report This Project
-                </button>
-                <button className="w-full bg-gray-600/40 hover:bg-gray-500/60 text-gray-200 py-3 md:py-4 px-4 md:px-6 rounded-sm text-base md:text-lg font-medium transition-all duration-300 flex items-center justify-center">
+                <button className="w-full bg-[#05A8DC] hover:bg-[#0494C7]  text-gray-200 py-3 md:py-4 px-4 md:px-6 rounded-sm text-base md:text-lg font-medium transition-all duration-300 flex items-center justify-center">
                   <RiShareForwardLine className="mr-2 text-xl" /> Share Analysis
                 </button>
-                <button className="w-full bg-gray-600/40 hover:bg-gray-500/60 text-gray-200 py-3 md:py-4 px-4 md:px-6 rounded-sm text-base md:text-lg font-medium transition-all duration-300">
+                <button className="w-full bg-gray-600/40 border border-[#05A8DC] hover:bg-gray-500/60 text-gray-200 py-3 md:py-4 px-4 md:px-6 rounded-sm text-base md:text-lg font-medium transition-all duration-300">
                   Subscribe to Updates
+                </button>
+                <button className="w-full  bg-gray-600/40 hover:bg-gray-500/60 text-white py-3 md:py-4 px-4 md:px-6 rounded-sm text-base md:text-lg font-medium transition-all duration-300">
+                  Report This Project
                 </button>
               </div>
             </div>
