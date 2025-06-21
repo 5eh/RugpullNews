@@ -1,196 +1,155 @@
 import type { Metadata } from "next";
 
-interface ArticleData {
-  id: number;
-  creator: string;
-  title: string;
-  link: string;
-  isodate: string;
-  content: string;
-  contentsnippet: string;
-  risk_level: string;
-  rugpull_score: number;
-  red_flags: string;
-  our_analysis: string;
-  summary_analysis: string;
-  banner_image: string;
-}
-
-interface ProcessedArticleData {
-  id: string;
-  title: string;
-  creator: string;
-  publishDate: string;
-  originalLink: string;
-  content: string;
-  contentSnippet: string;
-  riskLevel: string;
-  rugPullScore: number;
-  redFlags: string[];
-  analysis: string;
-  bannerImage?: string;
-}
-
-// Define the layout props interface
+// Define the Layout Props interface with params as a Promise
 interface ArticleLayoutProps {
-  params: { article: string };
+  params: Promise<{
+    article: string;
+  }>;
   children: React.ReactNode;
 }
 
-// No direct database connection in layout component
-
-// Function to fetch article data from the API
-async function fetchArticleData(
-  id: string,
-): Promise<ProcessedArticleData | null> {
+// Generate metadata for the article page
+export async function generateMetadata(
+  props: ArticleLayoutProps,
+): Promise<Metadata> {
   try {
+    // Await the params object to get the article ID
+    const resolvedParams = await props.params;
+    const articleId = resolvedParams.article;
+
+    // Fetch article data from API
     const isLocalDev = process.env.NODE_ENV === "development";
     const apiUrl = isLocalDev
-      ? `http://localhost:3000/api/get-article?id=${id}`
-      : `https://rugpullnews.org/api/get-article?id=${id}`;
+      ? `http://localhost:3000/api/get-article?id=${articleId}`
+      : `https://rugpullnews.org/api/get-article?id=${articleId}`;
 
     const response = await fetch(apiUrl, {
       cache: "no-store",
       headers: {
         Accept: "application/json",
       },
-      next: { revalidate: 3600 }, // Revalidate every hour
     });
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch article data: ${response.status}`);
+      return {
+        title: "Article Not Found | Rug Pull News",
+        description: "The requested article could not be found.",
+      };
     }
 
     const data = await response.json();
 
     if (!data.success || !data.article) {
-      throw new Error("Article data not found");
+      return {
+        title: "Article Not Found | Rug Pull News",
+        description: "The requested article could not be found.",
+      };
     }
 
-    const rawArticle: ArticleData = data.article;
+    const article = data.article;
 
-    // Parse red flags from string to array
-    const redFlags = rawArticle.red_flags
-      ? rawArticle.red_flags
+    // Create risk level text for SEO
+    const riskText = article.risk_level
+      ? `Risk Level: ${article.risk_level} | Rug Pull Score: ${article.rugpull_score}/10`
+      : "";
+
+    // Create description from content snippet or analysis
+    const description =
+      article.contentsnippet ||
+      (article.our_analysis && article.our_analysis.substring(0, 155)) ||
+      (article.summary_analysis &&
+        article.summary_analysis.substring(0, 155)) ||
+      "Crypto project risk analysis by Rug Pull News";
+
+    // Generate keywords from title and red flags
+    const redFlagsArray = article.red_flags
+      ? article.red_flags
           .split("\n")
-          .filter((flag) => flag.trim().length > 0)
-          .map((flag) => flag.replace(/^- /, "").trim())
+          .filter((flag: string) => flag.trim().length > 0)
+          .map((flag: string) => flag.replace(/^- /, "").trim())
       : [];
 
+    const keywords = [
+      "crypto",
+      "blockchain",
+      "rugpull",
+      "scam alert",
+      "cryptocurrency",
+      ...article.title.split(" ").filter((word: string) => word.length > 3),
+      ...redFlagsArray
+        .slice(0, 5)
+        .flatMap((flag: string) =>
+          flag.split(" ").filter((word: string) => word.length > 3),
+        ),
+    ]
+      .slice(0, 20)
+      .join(", ");
+
+    // Format date for metadata
+    const formattedDate = article.isodate
+      ? new Date(article.isodate).toISOString()
+      : new Date().toISOString();
+
+    // Construct full URL for article
+    const siteUrl =
+      process.env.NEXT_PUBLIC_SITE_URL || "https://rugpullnews.org";
+    const articleUrl = `${siteUrl}/${articleId}`;
+
+    // Create metadata base URL safely
+    let metadataBaseUrl;
+    try {
+      metadataBaseUrl = new URL(siteUrl);
+    } catch {
+      metadataBaseUrl = new URL("https://rugpullnews.org");
+    }
+
     return {
-      id: rawArticle.id.toString(),
-      title: rawArticle.title,
-      creator: rawArticle.creator || "Unknown or Anon",
-      publishDate: rawArticle.isodate,
-      originalLink: rawArticle.link,
-      content: rawArticle.content || rawArticle.contentsnippet || "",
-      contentSnippet: rawArticle.contentsnippet || "",
-      riskLevel: rawArticle.risk_level || "TBD",
-      rugPullScore: rawArticle.rugpull_score || 0,
-      redFlags,
-      analysis: rawArticle.our_analysis || rawArticle.summary_analysis || "",
-      bannerImage: rawArticle.banner_image,
+      title: `${article.title} | ${riskText} | Rug Pull News`,
+      description: description,
+      keywords: keywords,
+      authors: [{ name: article.creator || "Rug Pull News" }],
+      publisher: "Rug Pull News",
+      openGraph: {
+        title: article.title,
+        description: description,
+        url: articleUrl,
+        siteName: "Rug Pull News",
+        images: article.banner_image ? [{ url: article.banner_image }] : [],
+        locale: "en_US",
+        type: "article",
+        publishedTime: formattedDate,
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: article.title,
+        description: description,
+        images: article.banner_image ? [article.banner_image] : [],
+        creator: "@rugpullnews",
+        site: "@rugpullnews",
+      },
+      alternates: {
+        canonical: articleUrl,
+      },
+      robots: {
+        index: true,
+        follow: true,
+      },
+      metadataBase: metadataBaseUrl,
     };
-  } catch (error) {
-    console.error("Error fetching article:", error);
-    return null;
-  }
-}
-
-// Generate metadata for the article page
-export async function generateMetadata({
-  params,
-}: ArticleLayoutProps): Promise<Metadata> {
-  // Get the article ID from the URL parameters
-  const articleId = params.article;
-
-  // Fetch article data
-  const articleData = await fetchArticleData(articleId);
-
-  // If no article data, return default metadata
-  if (!articleData) {
-    return {
-      title: "Article Not Found | Rug Pull News",
-      description: "The requested article could not be found.",
-    };
-  }
-
-  // Create risk level text for SEO
-  const riskText = articleData.riskLevel
-    ? `Risk Level: ${articleData.riskLevel} | Rug Pull Score: ${articleData.rugPullScore}/10`
-    : "";
-
-  // Create description from content snippet or analysis
-  const description =
-    articleData.contentSnippet || articleData.analysis?.substring(0, 155) || "";
-
-  // Generate keywords from title and red flags
-  const keywords = [
-    "crypto",
-    "blockchain",
-    "rugpull",
-    "scam alert",
-    "cryptocurrency",
-    ...articleData.title.split(" ").filter((word) => word.length > 3),
-    ...articleData.redFlags
-      .slice(0, 5)
-      .flatMap((flag) => flag.split(" ").filter((word) => word.length > 3)),
-  ]
-    .slice(0, 20)
-    .join(", ");
-
-  // Format date for metadata
-  const formattedDate = new Date(articleData.publishDate).toISOString();
-
-  // Use formatted date in OpenGraph metadata
-
-  // Construct full URL for article
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://rugpullnews.org";
-  const articleUrl = `${siteUrl}/${articleId}`;
-
-  // Create metadata base URL safely
-  let metadataBaseUrl;
-  try {
-    metadataBaseUrl = new URL(siteUrl);
   } catch {
-    metadataBaseUrl = new URL("https://rugpullnews.org");
+    // Fallback metadata if fetch fails
+    return {
+      title: "Rug Pull News | Crypto Project Analysis",
+      description:
+        "Get yourself educated on Web3 scams, let's make this wild west safer.",
+    };
   }
-
-  return {
-    title: `${articleData.title} | ${riskText} | Rug Pull News`,
-    description: description,
-    keywords: keywords,
-    authors: [{ name: articleData.creator }],
-    publisher: "Rug Pull News",
-    openGraph: {
-      title: articleData.title,
-      description: description,
-      url: articleUrl,
-      siteName: "Rug Pull News",
-      images: articleData.bannerImage ? [{ url: articleData.bannerImage }] : [],
-      locale: "en_US",
-      type: "article",
-      publishedTime: formattedDate,
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: articleData.title,
-      description: description,
-      images: articleData.bannerImage ? [articleData.bannerImage] : [],
-      creator: "@arthurlabsdao",
-      site: "@arthurlabsdao",
-    },
-    alternates: {
-      canonical: articleUrl,
-    },
-    robots: {
-      index: true,
-      follow: true,
-    },
-    metadataBase: metadataBaseUrl,
-  };
 }
 
-export default function ArticleLayout({ children }: ArticleLayoutProps) {
-  return <>{children}</>;
+export default async function ArticleLayout(props: ArticleLayoutProps) {
+  // We don't need to use the params in the actual layout component
+  // But we need to await them to match the type
+  await props.params;
+
+  return <>{props.children}</>;
 }
