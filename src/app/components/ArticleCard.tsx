@@ -29,19 +29,19 @@ const formatDate = (isoDate: string) => {
 
 const getRiskLevelClass = (level?: string): string => {
   if (!level)
-    return "text-gray-200 border border-gray-500/30 text-xs px-2 py-1 rounded font-medium";
+    return "text-gray-200 border border-gray-500/30 text-xs px-2 py-1 rounded font-medium whitespace-nowrap";
 
   const levelUpper = level.toUpperCase();
 
   if (levelUpper.includes("HIGH")) {
-    return "text-red-300 border border-red-500/30 text-xs px-2 py-1 rounded font-medium";
+    return "text-red-300 border border-red-500/30 text-xs px-2 py-1 rounded font-medium whitespace-nowrap";
   } else if (levelUpper.includes("MEDIUM")) {
-    return "text-yellow-300 border border-yellow-500/30 text-xs px-2 py-1 rounded font-medium";
+    return "text-yellow-300 border border-yellow-500/30 text-xs px-2 py-1 rounded font-medium whitespace-nowrap";
   } else if (levelUpper.includes("LOW")) {
-    return "text-green-300 border border-green-500/30 text-xs px-2 py-1 rounded font-medium";
+    return "text-green-300 border border-green-500/30 text-xs px-2 py-1 rounded font-medium whitespace-nowrap";
   }
 
-  return "text-gray-200 border border-gray-500/30 text-xs px-2 py-1 rounded font-medium";
+  return "text-gray-200 border border-gray-500/30 text-xs px-2 py-1 rounded font-medium whitespace-nowrap";
 };
 
 interface ArticleCardProps {
@@ -96,7 +96,16 @@ export default function ArticleCard({
             <div className="text-xs text-gray-400 tracking-wide truncate max-w-[65%]">
               {article.creator || "ANON"}
               {(article.creator?.length || 0) <= 35 && (
-                <> • {formatDate(article.isodate)}</>
+                <>
+                  <span className="hidden md:inline">
+                    {" "}
+                    • {formatDate(article.isodate)}
+                  </span>
+                  <span className="inline md:hidden">
+                    {" "}
+                    • {new Date(article.isodate).getFullYear()}
+                  </span>
+                </>
               )}
             </div>
             {article.risk_level && (

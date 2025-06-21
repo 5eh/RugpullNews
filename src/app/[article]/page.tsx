@@ -190,21 +190,21 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
       <div className="max-w-6xl mx-auto px-8 py-12">
         {/* Header */}
         <div className="mb-12">
-          <div className="w-full flex justify-between">
-            <Link
-              href="/"
-              className="text-[#d6973e] font-subtitle hover:text-[#d6973e]/80 text-lg font-medium mb-6 inline-flex items-center transition-colors duration-300"
-            >
-              <RiArrowLeftLine className="mr-1" /> Back to Articles
-            </Link>
-
+          <div className="w-full flex flex-col md:flex-row md:justify-between">
             <Link
               href={articleData.originalLink}
-              className="text-[#d6973e] font-subtitle hover:text-[#d6973e]/80 text-lg font-medium mb-6 inline-flex items-center transition-colors duration-300"
+              className="text-[#d6973e] font-subtitle hover:text-[#d6973e]/80 text-lg font-medium mb-3 md:mb-6 inline-flex items-center transition-colors duration-300 order-1 md:order-2"
               target="_blank"
               rel="noopener noreferrer"
             >
               Original Source <RiExternalLinkLine className="ml-1" />
+            </Link>
+
+            <Link
+              href="/"
+              className="text-[#d6973e] font-subtitle hover:text-[#d6973e]/80 text-lg font-medium mb-6 inline-flex items-center transition-colors duration-300 order-2 md:order-1"
+            >
+              <RiArrowLeftLine className="mr-1" /> Back to Articles
             </Link>
           </div>
 
@@ -225,7 +225,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
               {articleData.creator} • {formatDate(articleData.publishDate)}
             </div>
             <div
-              className={`mb-4 py-1 px-3 rounded-sm font-subtitle text-sm font-medium inline-flex items-center ${getRiskColor(articleData.riskLevel)}`}
+              className={`mb-4 py-1 px-3 rounded-sm font-subtitle text-sm font-medium inline-flex items-center whitespace-nowrap ${getRiskColor(articleData.riskLevel)}`}
             >
               <span className="mr-1 opacity-80">Risk Level:</span>{" "}
               {articleData.riskLevel}
@@ -238,9 +238,9 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
         </div>
 
         {/* Content */}
-        <div className="grid md:grid-cols-3 gap-6 md:gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-12">
           {/* Main Content */}
-          <div className="md:col-span-2">
+          <div className="col-span-1 md:col-span-2">
             <div className="bg-gray-500/5 border-gray-500/20 border rounded-lg p-4 md:p-8 mb-8">
               <h2 className="text-xl md:text-2xl font-semibold font-subtitle text-white mb-4 md:mb-6">
                 Our Analysis

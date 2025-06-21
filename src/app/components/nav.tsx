@@ -204,8 +204,8 @@ const Navigation = () => {
         </div>
       </div>
 
-      {/* Static Ticker Map */}
-      <div className="border-b border-gray-700/30 overflow-x-auto">
+      {/* Static Ticker Map - Hidden on mobile */}
+      <div className="border-b border-gray-700/30 overflow-x-auto hidden md:block">
         <div className="max-w-7xl mx-auto px-4 py-3">
           <div className="flex flex-wrap md:flex-nowrap items-center justify-between text-xs text-gray-400">
             <div className="flex items-center space-x-3 md:space-x-6 mb-2 md:mb-0">
@@ -256,41 +256,11 @@ const Navigation = () => {
               </p>
             </div>
 
-            {/* Mobile menu button */}
-            <div className="lg:hidden">
-              <button
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="text-gray-300 hover:text-white transition-colors duration-300 p-2"
-              >
-                {isMobileMenuOpen ? (
-                  <svg
-                    className="h-6 w-6"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                ) : (
-                  <svg
-                    className="h-6 w-6"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M4 6h16M4 12h16m-7 6h7"
-                    />
-                  </svg>
-                )}
+            {/* Mobile menu button - hidden on desktop, moved to bottom menu */}
+            <div className="lg:hidden opacity-0">
+              {/* Placeholder to maintain layout, actual button moved to bottom */}
+              <button className="p-2">
+                <svg className="h-6 w-6 invisible" viewBox="0 0 24 24"></svg>
               </button>
             </div>
           </div>
@@ -413,7 +383,7 @@ const Navigation = () => {
 
           {/* Mobile menu */}
           {isMobileMenuOpen && (
-            <div className="lg:hidden pt-4 pb-2 border-t border-gray-700/30 mt-4">
+            <div className="lg:hidden pt-4 pb-24 border-t border-gray-700/30 mt-4">
               <div className="flex flex-col space-y-4">
                 <div className="flex items-center justify-center space-x-4 mb-2">
                   <button className="text-gray-300 hover:text-white transition-colors duration-300">
@@ -546,6 +516,127 @@ const Navigation = () => {
           animation-play-state: paused;
         }
       `}</style>
+
+      {/* Mobile Bottom Navigation */}
+      <div className="fixed bottom-0 left-0 right-0 bg-black/90 border-t border-gray-700/40 backdrop-blur-lg z-50 lg:hidden">
+        <div className="flex items-center justify-around px-2 py-3">
+          <Link href="/" className="flex flex-col items-center space-y-1">
+            <svg
+              className="h-6 w-6 text-gray-300"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+              />
+            </svg>
+            <span className="text-xs text-gray-300">Home</span>
+          </Link>
+
+          <Link href="/safety" className="flex flex-col items-center space-y-1">
+            <svg
+              className="h-6 w-6 text-gray-300"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+              />
+            </svg>
+            <span className="text-xs text-gray-300">Safety</span>
+          </Link>
+
+          {/* Central Menu Button */}
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="flex flex-col items-center justify-center -mt-8 bg-[#d68b36] hover:bg-[#d68b36]/80 text-white rounded-full h-16 w-16 shadow-lg transition-colors duration-300"
+          >
+            {isMobileMenuOpen ? (
+              <>
+                <svg
+                  className="h-7 w-7"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+                <span className="text-xs mt-1">Close</span>
+              </>
+            ) : (
+              <>
+                <svg
+                  className="h-7 w-7"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 12h16m-7 6h7"
+                  />
+                </svg>
+                <span className="text-xs mt-1">Menu</span>
+              </>
+            )}
+          </button>
+
+          <Link
+            href="/content"
+            className="flex flex-col items-center space-y-1"
+          >
+            <svg
+              className="h-6 w-6 text-gray-300"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"
+              />
+            </svg>
+            <span className="text-xs text-gray-300">Content</span>
+          </Link>
+
+          <Link
+            href="/whistleblowing"
+            className="flex flex-col items-center space-y-1"
+          >
+            <svg
+              className="h-6 w-6 text-gray-300"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <span className="text-xs text-gray-300">Report</span>
+          </Link>
+        </div>
+      </div>
     </div>
   );
 };
