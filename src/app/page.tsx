@@ -73,7 +73,7 @@ export default async function Home() {
   const { articles, error } = await getArticles();
 
   return (
-    <main className=" mx-auto px-4 py-6">
+    <main className="px-4 py-6 relative">
       <h1 className="sr-only">Rugpull News - Crypto Scam Analysis</h1>
 
       <Suspense
@@ -93,7 +93,8 @@ export default async function Home() {
         )}
 
         {articles.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-4 md:grid-rows-6 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 md:grid-rows-auto gap-4">
+            {/* Featured Article - Position 1 */}
             {articles.length > 0 && (
               <div className="col-span-full md:col-span-2 md:row-span-2">
                 <ArticleCard article={articles[0]} featured={true} />
@@ -141,6 +142,22 @@ export default async function Home() {
                 <ArticleCard article={articles[6]} doubleHeight={true} />
               </div>
             )}
+
+            {/* Position 8 - Ad Space (Sticky) */}
+            <div className="col-span-full md:col-span-1 md:col-start-4 md:row-start-1 md:row-span-6">
+              <div className="sticky top-4 rounded-lg flex flex-col items-center justify-start p-4 border border-red-800/30 max-h-[calc(100vh-2rem)] overflow-hidden">
+                <div className="text-center w-full">
+                  <h3 className="text-red-300 font-bold mb-3 uppercase tracking-wider text-sm">
+                    Looking to advertise?
+                  </h3>
+
+                  <p>
+                    Send a message to team@rugpullnews.org to check rates and
+                    lengths
+                  </p>
+                </div>
+              </div>
+            </div>
 
             {/* Loop through remaining articles in 3-column layout, skipping the ad column */}
             {articles.length > 7 && (

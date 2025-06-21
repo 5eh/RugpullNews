@@ -3,6 +3,11 @@
 import Link from "next/link";
 import React from "react";
 import Image from "next/image";
+import {
+  RiExternalLinkLine,
+  RiShareForwardLine,
+  RiArrowLeftLine,
+} from "react-icons/ri";
 
 interface ArticleData {
   id: number;
@@ -100,6 +105,7 @@ async function getArticleData(
       publishDate: rawArticle.isodate,
       originalLink: rawArticle.link,
       content: rawArticle.content || rawArticle.contentsnippet || "",
+      contentSnippet: rawArticle.contentsnippet || "",
       riskLevel: rawArticle.risk_level || "TBD",
       rugPullScore: rawArticle.rugpull_score || 0,
       redFlags,
@@ -145,15 +151,15 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
     switch (riskLevel) {
       case "HIGH RISK":
       case "HIGH":
-        return "text-red-300 bg-red-900/40";
+        return "text-red-300 border border-red-500/30";
       case "MEDIUM RISK":
       case "MEDIUM":
-        return "text-yellow-300 bg-yellow-900/40";
+        return "text-yellow-300 border border-yellow-500/30";
       case "LOW RISK":
       case "LOW":
-        return "text-green-300 bg-green-900/40";
+        return "text-green-300 border border-green-500/30";
       default:
-        return "text-gray-300 bg-gray-600/40";
+        return "text-gray-300 border border-gray-500/30";
     }
   };
 
@@ -187,18 +193,18 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           <div className="w-full flex justify-between">
             <Link
               href="/"
-              className="text-[#d6973e] font-subtitle hover:text-[#d6973e]/80 text-lg font-medium mb-6 inline-block transition-colors duration-300"
+              className="text-[#d6973e] font-subtitle hover:text-[#d6973e]/80 text-lg font-medium mb-6 inline-flex items-center transition-colors duration-300"
             >
-              ← Back to Articles
+              <RiArrowLeftLine className="mr-1" /> Back to Articles
             </Link>
 
             <Link
               href={articleData.originalLink}
-              className="text-[#d6973e] font-subtitle hover:text-[#d6973e]/80 text-lg font-medium mb-6 inline-block transition-colors duration-300"
+              className="text-[#d6973e] font-subtitle hover:text-[#d6973e]/80 text-lg font-medium mb-6 inline-flex items-center transition-colors duration-300"
               target="_blank"
               rel="noopener noreferrer"
             >
-              Original Source →
+              Original Source <RiExternalLinkLine className="ml-1" />
             </Link>
           </div>
 
@@ -214,55 +220,61 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
             </div>
           )}
 
-          <div className="w-full justify-between flex">
-            <div className="text-lg text-gray-300 font-title mb-4 py-2 text-left ">
+          <div className="w-full justify-between flex flex-wrap md:flex-nowrap">
+            <div className="text-lg text-gray-300 font-title mb-4 py-2 text-left">
               {articleData.creator} • {formatDate(articleData.publishDate)}
             </div>
             <div
-              className={`px-4 mb-4 py-2 rounded-sm font-subtitle text-lg font-medium text-center ${getRiskColor(articleData.riskLevel)}`}
+              className={`mb-4 py-1 px-3 rounded-sm font-subtitle text-sm font-medium inline-flex items-center ${getRiskColor(articleData.riskLevel)}`}
             >
+              <span className="mr-1 opacity-80">Risk Level:</span>{" "}
               {articleData.riskLevel}
             </div>
           </div>
 
-          <h1 className="text-3xl font-bold font-title text-white mb-6">
+          <h1 className="text-2xl md:text-3xl font-bold font-title text-white mb-6 leading-tight max-w-4xl">
             {articleData.title}
           </h1>
         </div>
 
         {/* Content */}
-        <div className="grid md:grid-cols-3 gap-12">
+        <div className="grid md:grid-cols-3 gap-6 md:gap-12">
           {/* Main Content */}
           <div className="md:col-span-2">
-            <div className="bg-gray-500/20 rounded-lg p-8 mb-8">
-              <h2 className="text-2xl font-semibold font-subtitle text-white mb-6">
+            <div className="bg-gray-500/20 rounded-lg p-4 md:p-8 mb-8">
+              <h2 className="text-xl md:text-2xl font-semibold font-subtitle text-white mb-4 md:mb-6">
                 Our Analysis
               </h2>
-              <div className="text-gray-300 leading-relaxed mb-8 text-lg whitespace-pre-line">
+              <div className="text-gray-300 leading-relaxed mb-8 text-base md:text-lg whitespace-pre-line max-w-prose">
                 {articleData.analysis}
               </div>
 
-              <div className="bg-gray-600/30 rounded-lg p-6">
-                <h3 className="font-semibold text-white mb-4 text-xl">
+              <div className="bg-gray-600/30 rounded-lg p-4 md:p-6">
+                <h3 className="font-semibold text-white mb-3 md:mb-4 text-lg md:text-xl">
                   Article Summary
                 </h3>
-                <p className="text-gray-300 text-lg leading-relaxed">
-                  {articleData.content}
+                <p className="text-gray-300 text-base md:text-lg leading-relaxed max-w-prose">
+                  {articleData.contentSnippet}
                 </p>
               </div>
             </div>
 
             {/* Red Flags */}
             {articleData.redFlags && articleData.redFlags.length > 0 && (
-              <div className="bg-gray-500/20 rounded-lg p-8">
-                <h3 className="text-xl font-semibold text-white mb-6">
-                  🚩 Red Flags Identified
+              <div className="bg-gray-500/20 rounded-lg p-4 md:p-8">
+                <h3 className="text-xl font-semibold text-white mb-4 md:mb-6 flex items-center">
+                  <span className="text-red-400 mr-2">🚩</span> Red Flags
+                  Identified
                 </h3>
-                <ul className="space-y-4">
+                <ul className="space-y-3 md:space-y-4 max-w-prose">
                   {articleData.redFlags.map((flag, index) => (
                     <li key={index} className="flex items-start">
-                      <span className="text-red-400 mr-3 text-lg">•</span>
-                      <span className="text-gray-300 text-lg">{flag}</span>
+                      <span className="text-red-400 mr-3 text-base md:text-lg">
+                        •
+                      </span>
+                      <span className="text-gray-300 text-base md:text-lg">
+                        {flag}
+                      </span>
                     </li>
                   ))}
                 </ul>
@@ -271,17 +283,17 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           </div>
 
           {/* Sidebar */}
-          <div className="space-y-8">
+          <div className="space-y-6 md:space-y-8 sticky top-4">
             {/* Rug Pull Score */}
-            <div className="bg-gray-500/20 rounded-lg p-8">
-              <h3 className="text-xl font-semibold text-white mb-6">
+            <div className="bg-gray-500/20 rounded-lg p-4 md:p-8">
+              <h3 className="text-lg md:text-xl font-semibold text-white mb-4 md:mb-6">
                 Rug Pull Score
               </h3>
               <div className="text-center">
-                <div className="text-5xl font-bold text-red-400 mb-4">
+                <div className="text-4xl md:text-5xl font-bold text-red-400 mb-4">
                   {articleData.rugPullScore}/10
                 </div>
-                <div className="text-lg text-gray-300">
+                <div className="text-base md:text-lg text-gray-300">
                   Based on our analysis
                 </div>
               </div>
@@ -295,26 +307,26 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
             </div>
 
             {/* Quick Actions */}
-            <div className="bg-gray-500/20 rounded-lg p-8">
-              <h3 className="text-xl font-semibold text-white mb-6">
+            <div className="bg-gray-500/20 rounded-lg p-4 md:p-8">
+              <h3 className="text-lg md:text-xl font-semibold text-white mb-4 md:mb-6">
                 Quick Actions
               </h3>
-              <div className="space-y-4">
-                <button className="w-full bg-[#05A8DC] hover:bg-[#0494C7] text-white py-4 px-6 rounded-sm text-lg font-medium transition-all duration-300">
+              <div className="space-y-3 md:space-y-4">
+                <button className="w-full bg-[#05A8DC] hover:bg-[#0494C7] text-white py-3 md:py-4 px-4 md:px-6 rounded-sm text-base md:text-lg font-medium transition-all duration-300">
                   Report This Project
                 </button>
-                <button className="w-full bg-gray-600/40 hover:bg-gray-500/60 text-gray-200 py-4 px-6 rounded-sm text-lg font-medium transition-all duration-300">
-                  Share Analysis
+                <button className="w-full bg-gray-600/40 hover:bg-gray-500/60 text-gray-200 py-3 md:py-4 px-4 md:px-6 rounded-sm text-base md:text-lg font-medium transition-all duration-300 flex items-center justify-center">
+                  <RiShareForwardLine className="mr-2 text-xl" /> Share Analysis
                 </button>
-                <button className="w-full bg-gray-600/40 hover:bg-gray-500/60 text-gray-200 py-4 px-6 rounded-sm text-lg font-medium transition-all duration-300">
+                <button className="w-full bg-gray-600/40 hover:bg-gray-500/60 text-gray-200 py-3 md:py-4 px-4 md:px-6 rounded-sm text-base md:text-lg font-medium transition-all duration-300">
                   Subscribe to Updates
                 </button>
               </div>
             </div>
 
             {/* Disclaimer */}
-            <div className="bg-yellow-900/30 rounded-lg p-6">
-              <div className="text-sm text-yellow-200">
+            <div className="bg-yellow-900/30 rounded-lg p-4 md:p-6">
+              <div className="text-xs md:text-sm text-yellow-200">
                 <strong>Disclaimer:</strong> This analysis is for informational
                 purposes only and should not be considered financial advice.
                 Always conduct your own research before making investment
