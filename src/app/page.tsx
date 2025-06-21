@@ -161,16 +161,16 @@ export default async function Home() {
 
             {/* Loop through remaining articles in 3-column layout, skipping the ad column */}
             {articles.length > 7 && (
-              <div className="col-span-full md:col-span-3 mt-8 pb-16 md:pb-0">
+              <div className="col-span-full md:col-span-4 mt-8 pb-16 md:pb-0">
                 <h2 className="text-xl font-bold text-white mb-6 font-title border-b border-gray-700/50 pb-2">
                   More Stories
                 </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
                   {articles.slice(7).map((article) => (
                     <ArticleCard
                       key={article.id}
                       article={article}
-                      className="mb-4 md:mb-0"
+                      className="mb-4 md:mb-0 rounded-none"
                     />
                   ))}
                 </div>
