@@ -3,6 +3,7 @@ import { Oswald, Lato, Noto_Sans_JP } from "next/font/google";
 import "./globals.css";
 import Navigation from "./components/nav";
 import Footer from "./components/footer";
+import { Analytics } from "@vercel/analytics/next";
 
 const oswald = Oswald({
   variable: "--font-oswald",
@@ -25,7 +26,7 @@ const noto_sans_jp = Noto_Sans_JP({
 export const metadata: Metadata = {
   title: "Rugpull News",
   description:
-    "Get yourself educated on Web3 scams, let's make this wild west safer. Sponsored by Arthur Labs.",
+    "Get yourself educated on Web3 scams, let's make this wild west safer.",
 };
 
 export default function RootLayout({
@@ -39,6 +40,7 @@ export default function RootLayout({
         className={`${oswald.variable} ${lato.variable} ${noto_sans_jp.variable} antialiased`}
       >
         <Navigation />
+        <Analytics />
         <div className="w-full mx-auto justify-center">{children}</div>
         <Footer />
       </body>
