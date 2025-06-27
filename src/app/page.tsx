@@ -95,14 +95,18 @@ export default async function Home() {
           <div className="grid grid-cols-1 md:grid-cols-4 md:grid-rows-auto gap-4 md:gap-5">
             {/* Featured Article - Position 1 */}
             {articles.length > 0 && (
-              <div className="col-span-full md:col-span-2 md:row-span-2 mb-4 md:mb-0">
-                <ArticleCard article={articles[0]} featured={true} />
+              <div className="col-span-full  md:col-span-2 md:row-span-2 mb-4 md:mb-0">
+                <ArticleCard
+                  article={articles[0]}
+                  featured={true}
+                  className=""
+                />
               </div>
             )}
 
             {/* Position 2 */}
             {articles.length > 1 && (
-              <div className="col-span-full sm:col-span-1 md:col-span-1 md:col-start-1 md:row-start-3 md:row-span-2 mb-4 md:mb-0">
+              <div className="col-span-full  sm:col-span-1 md:col-span-1 md:col-start-1 md:row-start-3 md:row-span-2 mb-4 md:mb-0">
                 <ArticleCard article={articles[1]} doubleHeight={true} />
               </div>
             )}

@@ -345,12 +345,6 @@ const Navigation = () => {
               </svg>
             </button>
             <Link
-              href="https://arthurlabs.net"
-              className="text-sm text-gray-300 hover:text-white transition-colors duration-300"
-            >
-              Arthur Labs
-            </Link>
-            <Link
               href="/sponsors"
               className="text-sm text-gray-300 hover:text-white transition-colors duration-300"
             >

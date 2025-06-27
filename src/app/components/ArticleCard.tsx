@@ -53,15 +53,14 @@ interface ArticleCardProps {
 
 export default function ArticleCard({
   article,
-  featured = false,
+  featured,
   doubleHeight = false,
   className = "",
 }: ArticleCardProps) {
   return (
     <div
-      className={`group h-full flex flex-col grayscale hover:grayscale-0 transition-all duration-300 hover:bg-gray-500/5 hover:border-gray-500/20  rounded-lg overflow-hidden border border-gray-700/30 ${className}`}
+      className={`group h-full blur-sm hover:transition hover:blur-none ease-in-out flex flex-col ${featured ? "!blur-none" : " grayscale hover:grayscale-0"} transition-all duration-300 hover:bg-gray-500/5 hover:border-gray-500/20 rounded-lg overflow-hidden border border-gray-700/30 ${className}`}
     >
-      {/* Image with link */}
       <Link href={`/${article.id}`} className="block">
         <div
           className={`${
@@ -109,7 +108,10 @@ export default function ArticleCard({
               )}
             </div>
             {article.risk_level && (
-              <div className={getRiskLevelClass(article.risk_level)}>
+              <div
+                className={`${getRiskLevelClass(article.risk_level)} filter-none`}
+                style={{ filter: "none" }}
+              >
                 {article.risk_level}
               </div>
             )}
@@ -128,7 +130,7 @@ export default function ArticleCard({
             </h3>
           </Link>
 
-          <p className="text-sm font-subtitle text-gray-300 leading-relaxed line-clamp-3 max-w-prose">
+          <p className="text-sm font-subtitle text-gray-300 leading-relaxed line-clamp-3 w-full tracking-wide">
             {article.contentsnippet}
           </p>
         </div>
