@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import Loading from "./components/loading";
 import ArticleCard from "./components/ArticleCard";
+import ArticleHintTooltip from "./components/ArticleHintTooltip";
 
 interface Article {
   id: number;
@@ -193,6 +194,9 @@ export default async function Home() {
           </div>
         )}
       </Suspense>
+
+      {/* Tooltip that explains the blurred article interaction */}
+      <ArticleHintTooltip />
     </main>
   );
 }

@@ -61,7 +61,7 @@ const SponsorCard: React.FC<SponsorCardProps> = ({ sponsor, tierClass }) => {
           href={sponsor.websiteUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="px-4 py-2 bg-red-900/30 hover:bg-red-800/50 rounded text-red-200 transition-all duration-300 hover:shadow-md"
+          className="px-4 py-2 text-[#d6973e] hover:text-white transition-all duration-300 hover:shadow-md"
         >
           Visit Website
         </a>

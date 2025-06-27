@@ -24,7 +24,7 @@ const noto_sans_jp = Noto_Sans_JP({
 });
 
 export const metadata: Metadata = {
-  title: "Rugpull News",
+  title: "Rugpull News - Scam Prevention",
   description:
     "Get yourself educated on Web3 scams, let's make this wild west safer.",
 };

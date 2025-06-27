@@ -10,7 +10,7 @@ export const goldSponsors: Sponsor[] = [
   {
     id: 1,
     name: "Arthur Labs",
-    description: "Leading the way in blockchain research and development",
+    description: "A dApp, blockchain and automation service provider",
     logoUrl: "/sponsors/Arthur_Labs_Logo.png",
     websiteUrl: "https://arthurlabs.net",
   },

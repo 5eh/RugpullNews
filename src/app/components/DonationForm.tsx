@@ -15,34 +15,36 @@ const DonationForm: React.FC = () => {
       </p>
 
       <form className="mx-auto">
-        <div className="mb-4">
-          <label
-            htmlFor="name"
-            className="block text-sm font-medium text-gray-400 mb-1"
-          >
-            Name
-          </label>
-          <input
-            type="text"
-            id="name"
-            className="w-full p-3 rounded bg-gray-800 border border-gray-700 text-white text-lg"
-            placeholder="Your Name"
-          />
-        </div>
+        <div className="flex flex-col md:flex-row gap-8 mb-4">
+          <div className="w-full">
+            <label
+              htmlFor="name"
+              className="block text-sm font-medium text-gray-400 mb-1"
+            >
+              Name
+            </label>
+            <input
+              type="text"
+              id="name"
+              className="w-full p-3 pl-8 rounded placeholder-gray-300 border hover:border-[#d6973e] border-gray-700 text-white text-lg"
+              placeholder="Gavin Belson"
+            />
+          </div>
 
-        <div className="mb-4">
-          <label
-            htmlFor="email"
-            className="block text-sm font-medium text-gray-400 mb-1"
-          >
-            Email
-          </label>
-          <input
-            type="email"
-            id="email"
-            className="w-full p-3 rounded bg-gray-800 border border-gray-700 text-white text-lg"
-            placeholder="your@email.com"
-          />
+          <div className="w-full">
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-400 mb-1"
+            >
+              Email
+            </label>
+            <input
+              type="email"
+              id="email"
+              className="w-full p-3 pl-8 rounded placeholder-gray-300 border hover:border-[#d6973e] border-gray-700 text-white text-lg"
+              placeholder="gavin@hooli.com"
+            />
+          </div>
         </div>
 
         <div className="mb-4">
@@ -59,8 +61,8 @@ const DonationForm: React.FC = () => {
             <input
               type="number"
               id="amount"
-              className="w-full p-3 pl-8 rounded bg-gray-800 border border-gray-700 text-white text-lg"
-              placeholder="50"
+              className="w-full p-3 pl-8 rounded placeholder-gray-300 border hover:border-[#d6973e] border-gray-700 text-white text-lg"
+              placeholder="250"
               min="5"
             />
           </div>
@@ -75,7 +77,7 @@ const DonationForm: React.FC = () => {
           </label>
           <textarea
             id="message"
-            className="w-full p-3 rounded bg-gray-800 border border-gray-700 text-white text-lg"
+            className="w-full p-3 pl-8 rounded placeholder-gray-300 border hover:border-[#d6973e] border-gray-700 text-white text-lg"
             rows={3}
             placeholder="Any message you'd like to include with your donation"
           ></textarea>
@@ -85,7 +87,7 @@ const DonationForm: React.FC = () => {
           type="submit"
           className="w-full py-4 bg-gray-800 hover:bg-gray-700 rounded font-medium text-white transition-all duration-300 text-lg"
         >
-          Donate Now
+          Read to donate ❤️
         </button>
 
         <p className="text-sm text-center mt-6 text-gray-500">
