@@ -197,7 +197,7 @@ const Navigation = () => {
       <nav
         className={`fixed top-0 left-0 right-0 w-full z-50 transition-all duration-300
         ${scrolled ? "bg-black/95 backdrop-blur-xl shadow-lg" : "bg-black/80 backdrop-blur-md"}
-        lg:static md:static`}
+        lg:relative md:static`}
       >
         {/* 1. Ticker Tracker - Dynamic Articles (TOP) */}
         <div className="border-b border-gray-700/30 overflow-hidden">
@@ -338,12 +338,9 @@ const Navigation = () => {
             </div>
           </div>
         </div>
-      </nav>
 
-      {/* DESKTOP NAVIGATION - Visible only on larger screens */}
-      <div className="hidden lg:block mt-20">
-        {/* Desktop Navigation Links */}
-        <div className="flex items-center justify-center space-x-8 py-4">
+        {/* Desktop Navigation Links - Only visible on desktop */}
+        <div className="hidden lg:flex items-center justify-center space-x-8 py-4 border-t border-gray-700/30">
           <button className="text-gray-300 hover:text-white transition-colors duration-300">
             <svg
               className="h-5 w-5"
@@ -451,7 +448,9 @@ const Navigation = () => {
             Donate
           </button>
         </div>
-      </div>
+      </nav>
+
+      {/* DESKTOP NAVIGATION - Moved inside nav for proper layout */}
 
       {/* Mobile menu */}
       {isMobileMenuOpen && (
