@@ -74,7 +74,7 @@ export default async function Home() {
   const { articles, error } = await getArticles();
 
   return (
-    <main className="px-4 py-6 pb-24 md:pb-6 relative">
+    <main className="px-3 sm:px-4 py-6 pb-24 md:pb-6 relative overflow-hidden">
       <h1 className="sr-only">Rugpull News - Crypto Scam Analysis</h1>
 
       <Suspense
@@ -94,9 +94,9 @@ export default async function Home() {
 
         {articles.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-4 md:grid-rows-auto gap-4 md:gap-5">
-            {/* Featured Article - Position 1 */}
+            {/* Featured Article - Position 1 - Full width on mobile */}
             {articles.length > 0 && (
-              <div className="col-span-full  md:col-span-2 md:row-span-2 mb-4 md:mb-0">
+              <div className="col-span-full md:col-span-2 md:row-span-2 mb-4">
                 <ArticleCard
                   article={articles[0]}
                   featured={true}
@@ -105,44 +105,62 @@ export default async function Home() {
               </div>
             )}
 
+            {/* Mobile-optimized staggered grid */}
+            <div className="grid grid-cols-2 gap-2 md:hidden">
+              {/* Left column - starts higher */}
+              <div className="-mt-1 flex flex-col gap-2">
+                {articles.length > 1 && <ArticleCard article={articles[1]} />}
+                {articles.length > 3 && <ArticleCard article={articles[3]} />}
+                {articles.length > 5 && <ArticleCard article={articles[5]} />}
+              </div>
+
+              {/* Right column - starts lower */}
+              <div className="mt-3 flex flex-col gap-2">
+                {articles.length > 2 && <ArticleCard article={articles[2]} />}
+                {articles.length > 4 && <ArticleCard article={articles[4]} />}
+                {articles.length > 6 && <ArticleCard article={articles[6]} />}
+              </div>
+            </div>
+
+            {/* Desktop layout - hidden on mobile */}
             {/* Position 2 */}
             {articles.length > 1 && (
-              <div className="col-span-full  sm:col-span-1 md:col-span-1 md:col-start-1 md:row-start-3 md:row-span-2 mb-4 md:mb-0">
+              <div className="hidden md:block md:col-span-1 md:col-start-1 md:row-start-3 md:row-span-2">
                 <ArticleCard article={articles[1]} doubleHeight={true} />
               </div>
             )}
 
             {/* Position 3 */}
             {articles.length > 2 && (
-              <div className="col-span-full sm:col-span-1 md:col-span-1 md:col-start-3 md:row-start-1 md:row-span-3 mb-4 md:mb-0">
+              <div className="hidden md:block md:col-span-1 md:col-start-3 md:row-start-1 md:row-span-3">
                 <ArticleCard article={articles[2]} doubleHeight={true} />
               </div>
             )}
 
             {/* Position 4 */}
             {articles.length > 3 && (
-              <div className="col-span-full sm:col-span-1 md:col-span-1 md:col-start-2 md:row-start-3 md:row-span-2 mb-4 md:mb-0">
+              <div className="hidden md:block md:col-span-1 md:col-start-2 md:row-start-3 md:row-span-2">
                 <ArticleCard article={articles[3]} doubleHeight={true} />
               </div>
             )}
 
             {/* Position 5 */}
             {articles.length > 4 && (
-              <div className="col-span-full sm:col-span-1 md:col-span-1 md:col-start-1 md:row-start-5 md:row-span-2 mb-4 md:mb-0">
+              <div className="hidden md:block md:col-span-1 md:col-start-1 md:row-start-5 md:row-span-2">
                 <ArticleCard article={articles[4]} doubleHeight={true} />
               </div>
             )}
 
             {/* Position 6 */}
             {articles.length > 5 && (
-              <div className="col-span-full sm:col-span-1 md:col-span-1 md:col-start-2 md:row-start-5 md:row-span-2 mb-4 md:mb-0">
+              <div className="hidden md:block md:col-span-1 md:col-start-2 md:row-start-5 md:row-span-2">
                 <ArticleCard article={articles[5]} doubleHeight={true} />
               </div>
             )}
 
             {/* Position 7 */}
             {articles.length > 6 && (
-              <div className="col-span-full sm:col-span-1 md:col-span-1 md:col-start-3 md:row-start-4 md:row-span-3 mb-4 md:mb-0">
+              <div className="hidden md:block md:col-span-1 md:col-start-3 md:row-start-4 md:row-span-3">
                 <ArticleCard article={articles[6]} doubleHeight={true} />
               </div>
             )}
@@ -163,18 +181,18 @@ export default async function Home() {
               </div>
             </div>
 
-            {/* Loop through remaining articles in 3-column layout, skipping the ad column */}
+            {/* Loop through remaining articles in 2-column layout on mobile, 4-column on desktop */}
             {articles.length > 7 && (
               <div className="col-span-full md:col-span-4 mt-8 pb-16 md:pb-0">
-                <h2 className="text-xl font-bold text-white mb-6 font-title border-b border-gray-700/50 pb-2">
+                <h2 className="text-xl font-bold text-white mb-4 md:mb-6 font-title border-b border-gray-700/50 pb-2">
                   More Stories
                 </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-                  {articles.slice(7).map((article) => (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-6">
+                  {articles.slice(7).map((article, index) => (
                     <ArticleCard
                       key={article.id}
                       article={article}
-                      className="mb-4 md:mb-0 rounded-none"
+                      className={`mb-3 md:mb-0 rounded-none ${index % 2 === 0 ? "-mt-1" : "mt-3"}`}
                     />
                   ))}
                 </div>

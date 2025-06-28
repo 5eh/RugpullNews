@@ -5,8 +5,28 @@ import { IoClose } from "react-icons/io5";
 
 const ArticleHintTooltip = () => {
   const [isVisible, setIsVisible] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(false);
 
   useEffect(() => {
+    // Function to check if device is desktop (>= 1024px)
+    const checkIfDesktop = () => {
+      setIsDesktop(window.innerWidth >= 1024);
+    };
+
+    // Check initially
+    checkIfDesktop();
+
+    // Add event listener for window resize
+    window.addEventListener("resize", checkIfDesktop);
+
+    // Cleanup
+    return () => window.removeEventListener("resize", checkIfDesktop);
+  }, []);
+
+  useEffect(() => {
+    // Only show on desktop devices
+    if (!isDesktop) return;
+
     // Check if the user has seen the tooltip before
     const hasSeenTooltip = localStorage.getItem("hasSeenArticleHint");
 
@@ -18,7 +38,7 @@ const ArticleHintTooltip = () => {
 
       return () => clearTimeout(timer);
     }
-  }, []);
+  }, [isDesktop]);
 
   const dismissTooltip = () => {
     setIsVisible(false);
@@ -26,7 +46,8 @@ const ArticleHintTooltip = () => {
     localStorage.setItem("hasSeenArticleHint", "true");
   };
 
-  if (!isVisible) return null;
+  // Don't render on mobile/tablet devices or if not visible
+  if (!isDesktop || !isVisible) return null;
 
   return (
     <div className="fixed bottom-20 right-4 md:bottom-8 md:right-8 max-w-xs md:max-w-sm z-50 bg-white rounded-lg shadow-lg overflow-hidden transition-all duration-300 ease-in-out">

@@ -41,7 +41,9 @@ export default function RootLayout({
       >
         <Navigation />
         <Analytics />
-        <div className="w-full mx-auto justify-center">{children}</div>
+        <div className="w-full mx-auto justify-center pt-[180px] md:pt-[150px] lg:pt-0">
+          {children}
+        </div>
         <Footer />
       </body>
     </html>

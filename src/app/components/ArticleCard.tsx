@@ -59,16 +59,16 @@ export default function ArticleCard({
 }: ArticleCardProps) {
   return (
     <div
-      className={`group h-full blur-sm hover:transition hover:blur-none ease-in-out flex flex-col ${featured ? "!blur-none" : " grayscale hover:grayscale-0"} transition-all duration-300 hover:bg-gray-500/5 hover:border-gray-500/20 rounded-lg overflow-hidden border border-gray-700/30 ${className}`}
+      className={`group lg:blur-sm lg:hover:blur-none ease-in-out flex flex-col justify-between ${featured ? "!blur-none" : "lg:grayscale lg:hover:grayscale-0"} transition-all duration-300 hover:bg-gray-500/5 hover:border-gray-500/20 rounded-lg overflow-hidden border border-gray-700/30 ${className}`}
     >
       <Link href={`/${article.id}`} className="block">
         <div
           className={`${
             featured
-              ? "h-72 sm:h-96"
+              ? "h-44 sm:h-56 md:h-72 lg:h-96"
               : doubleHeight
-                ? "h-96 sm:h-[32rem]"
-                : "h-64"
+                ? "h-36 sm:h-56 md:h-96 lg:h-[32rem]"
+                : "h-32 sm:h-44 md:h-64"
           } w-full overflow-hidden relative group-hover:shadow-md transition-all`}
         >
           <Image
@@ -89,32 +89,28 @@ export default function ArticleCard({
         </div>
       </Link>
 
-      <div className="p-4 flex-1 flex flex-col justify-between">
-        <div className="space-y-3">
+      <div className="p-2 sm:p-4 flex flex-col flex-grow">
+        <div className="space-y-2 sm:space-y-3">
           <div className="flex items-center justify-between gap-2">
-            <div className="text-xs text-gray-400 tracking-wide truncate max-w-[65%]">
+            <div className="text-[10px] sm:text-xs text-gray-400 tracking-wide truncate max-w-full font-medium">
               {article.creator || "ANON"}
               {(article.creator?.length || 0) <= 35 && (
-                <>
-                  <span className="hidden md:inline">
-                    {" "}
-                    • {formatDate(article.isodate)}
-                  </span>
-                  <span className="inline md:hidden">
-                    {" "}
-                    • {new Date(article.isodate).getFullYear()}
-                  </span>
-                </>
+                <span className="hidden md:inline">
+                  {" "}
+                  • {formatDate(article.isodate)}
+                </span>
               )}
             </div>
-            {article.risk_level && (
-              <div
-                className={`${getRiskLevelClass(article.risk_level)} filter-none`}
-                style={{ filter: "none" }}
-              >
-                {article.risk_level}
-              </div>
-            )}
+            <div className="md:block hidden">
+              {article.risk_level && (
+                <div
+                  className={`${getRiskLevelClass(article.risk_level)} filter-none`}
+                  style={{ filter: "none" }}
+                >
+                  {article.risk_level}
+                </div>
+              )}
+            </div>
           </div>
 
           <Link
@@ -123,33 +119,51 @@ export default function ArticleCard({
           >
             <h3
               className={`${
-                featured ? "text-xl" : "text-base"
+                featured
+                  ? "text-sm sm:text-lg md:text-xl"
+                  : "text-xs sm:text-sm md:text-base"
               } font-bold font-title hover:text-[#d6973e] hover:transition hover:ease-in-out duration-300 text-white leading-tight max-w-prose`}
             >
               {article.title}
             </h3>
           </Link>
 
-          <p className="text-sm font-subtitle text-gray-300 leading-relaxed line-clamp-3 w-full tracking-wide">
+          <p className="text-[10px] sm:text-xs md:text-sm font-subtitle text-gray-300 leading-relaxed line-clamp-2 sm:line-clamp-3 w-full tracking-wide">
             {article.contentsnippet}
           </p>
         </div>
 
-        <div className="flex justify-end gap-4 mt-4 pt-2 border-t border-gray-700/30">
-          <a
-            href={article.link}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs text-gray-400 hover:text-gray-200 transition-colors duration-300 flex items-center"
-          >
-            Original <RiExternalLinkLine className="ml-1" />
-          </a>
-          <Link
-            href={`/${article.id}`}
-            className="text-xs font-title text-[#d6973e] hover:text-[#d68b36] transition-colors duration-300 font-medium"
-          >
-            Our Report
-          </Link>
+        <div className="mt-auto pt-2">
+          {/* Risk level indicator for mobile - above the border */}
+          <div className="block sm:hidden mb-2">
+            {article.risk_level && (
+              <div
+                className={`${getRiskLevelClass(article.risk_level)} filter-none text-[9px] px-1 py-0.5 inline-block`}
+                style={{ filter: "none" }}
+              >
+                {article.risk_level}
+              </div>
+            )}
+          </div>
+
+          <div className="flex flex-col sm:flex-row sm:justify-end gap-1 sm:gap-4 pt-1 sm:pt-2 border-t border-gray-700/30">
+            <div className="flex items-center justify-start w-full sm:w-auto">
+              <a
+                href={article.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[10px] sm:text-xs text-gray-400 hover:text-gray-200 transition-colors duration-300 flex items-center"
+              >
+                Original <RiExternalLinkLine className="ml-1" />
+              </a>
+            </div>
+            <Link
+              href={`/${article.id}`}
+              className="text-[10px] sm:text-xs font-title text-[#d6973e] hover:text-[#d68b36] transition-colors duration-300 font-medium sm:text-right text-left"
+            >
+              Our Report
+            </Link>
+          </div>
         </div>
       </div>
     </div>
