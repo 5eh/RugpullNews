@@ -29,9 +29,18 @@ export const silverSponsors: Sponsor[] = [
 export const bronzeSponsors: Sponsor[] = [
   {
     id: 4,
-    name: "Crypto News Daily",
-    description: "Your source for daily crypto updates",
-    logoUrl: "/sponsors/cnd-logo.png",
-    websiteUrl: "https://example.com/cnd",
+    name: "LifeXP",
+    description:
+      "Capture, verify, and showcase your most meaningful life achievements as digital proof on the blockchain.",
+    logoUrl: "/sponsors/LifeXP_Logo.png",
+    websiteUrl: "https://lifexp.world",
+  },
+  {
+    id: 5,
+    name: "Aemula",
+    description:
+      "A decentralized protocol for independent journalism on a mission to reverse the trend of polarization in media.",
+    logoUrl: "/sponsors/Aemula_Logo.png",
+    websiteUrl: "https://aemula.com",
   },
 ];

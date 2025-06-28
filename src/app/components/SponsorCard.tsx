@@ -22,7 +22,7 @@ const SponsorCard: React.FC<SponsorCardProps> = ({ sponsor, tierClass }) => {
       className={`p-8 rounded-lg border-2 ${tierClass} transition-all duration-300`}
     >
       <div className="flex flex-col items-center text-center">
-        <div className="w-64 h-64 mb-6 relative flex items-center justify-center rounded-full overflow-hidden">
+        <div className="w-64 h-64 mb-6 relative flex items-center justify-center  overflow-hidden">
           {sponsor.logoUrl ? (
             <>
               <div className="relative w-full h-full flex items-center justify-center">

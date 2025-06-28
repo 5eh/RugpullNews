@@ -284,12 +284,26 @@ const Navigation = () => {
         {/* 2. Logo Section (MIDDLE) */}
         <div className="border-b border-gray-700/30 py-2 md:py-4">
           <div className="flex-grow text-center">
-            <Link
-              href="/"
-              className="text-2xl md:text-4xl lg:text-6xl font-bold font-title text-white hover:text-[#d6973e] transition-colors duration-300 inline-block"
-            >
-              RUGPULL news
-            </Link>
+            <div className="inline-flex items-center justify-center">
+              <div className="hidden lg:block w-14 h-14 overflow-hidden rounded-full mr-3">
+                <video
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="w-full h-full object-cover"
+                >
+                  <source src="/Logo.mp4" type="video/mp4" />
+                  Your browser does not support the video tag.
+                </video>
+              </div>
+              <Link
+                href="/"
+                className="text-2xl md:text-4xl lg:text-6xl font-bold font-title text-white hover:text-[#d6973e] transition-colors duration-300 inline-block"
+              >
+                RUGPULL news
+              </Link>
+            </div>
             <p className="w-full text-center text-[#d6973e] mt-0 md:mt-2 text-[10px] md:text-sm">
               Helping you not get rugged.
             </p>
@@ -332,9 +346,6 @@ const Navigation = () => {
                   </span>
                 );
               })}
-              <span className="inline-block text-xs md:text-sm">
-                F&G: <span className="text-yellow-400">48</span>
-              </span>
             </div>
           </div>
         </div>

@@ -39,7 +39,6 @@ interface ProcessedArticleData {
   bannerImage?: string;
 }
 
-// Define the PageProps interface with params as a Promise
 interface ArticlePageProps {
   params: Promise<{
     article: string;
@@ -91,12 +90,41 @@ async function getArticleData(
     const rawArticle: ArticleData = data.article;
 
     // Parse red flags from string to array
-    const redFlags = rawArticle.red_flags
-      ? rawArticle.red_flags
-          .split("\n")
-          .filter((flag) => flag.trim().length > 0)
-          .map((flag) => flag.replace(/^- /, "").trim())
-      : [];
+    let redFlags = [];
+
+    if (rawArticle.red_flags) {
+      if (typeof rawArticle.red_flags === "string") {
+        // Check if it's a JSON array string (starts with [ and ends with ])
+        if (
+          rawArticle.red_flags.trim().startsWith("[") &&
+          rawArticle.red_flags.trim().endsWith("]")
+        ) {
+          try {
+            // Try to parse it as JSON
+            const parsedFlags = JSON.parse(rawArticle.red_flags);
+            if (Array.isArray(parsedFlags)) {
+              redFlags = parsedFlags;
+            }
+          } catch (e) {
+            console.error("Failed to parse red_flags as JSON:", e);
+            // Fallback to original parsing method
+            redFlags = rawArticle.red_flags
+              .split("\n")
+              .filter((flag) => flag.trim().length > 0)
+              .map((flag) => flag.replace(/^- /, "").trim());
+          }
+        } else {
+          // Use the original newline splitting method for non-JSON strings
+          redFlags = rawArticle.red_flags
+            .split("\n")
+            .filter((flag) => flag.trim().length > 0)
+            .map((flag) => flag.replace(/^- /, "").trim());
+        }
+      } else if (Array.isArray(rawArticle.red_flags)) {
+        // It's already an array
+        redFlags = rawArticle.red_flags;
+      }
+    }
 
     return {
       id: rawArticle.id.toString(),
@@ -122,9 +150,7 @@ async function getArticleData(
   }
 }
 
-// Remove the @ts-ignore and use the defined interface
 export default async function ArticlePage({ params }: ArticlePageProps) {
-  // Await the params object here
   const resolvedParams = await params;
   const articleId = resolvedParams.article;
 
@@ -166,7 +192,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
   if (!articleData) {
     return (
       <div className="min-h-screen">
-        <div className="max-w-6xl mx-auto px-8 py-12">
+        <div className=" max-w-6xl mx-auto px-8 py-12">
           <Link
             href="/"
             className="text-[#d6973e] hover:text-[#d6973e]/80 text-lg font-medium mb-6 inline-block transition-colors duration-300"
@@ -227,7 +253,6 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
             <div
               className={`mb-4 py-1 px-3 rounded-sm font-subtitle text-sm font-medium inline-flex items-center whitespace-nowrap ${getRiskColor(articleData.riskLevel)}`}
             >
-              <span className="mr-1 opacity-80">Risk Level:</span>{" "}
               {articleData.riskLevel}
             </div>
           </div>
@@ -266,18 +291,16 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                   <span className="text-red-400 mr-2">🚩</span> Red Flags
                   Identified
                 </h3>
-                <ul className="space-y-3 md:space-y-4 max-w-prose">
+                <ol className="space-y-3 md:space-y-4 max-w-prose list-decimal pl-5">
                   {articleData.redFlags.map((flag, index) => (
-                    <li key={index} className="flex items-start">
-                      <span className="text-red-400 mr-3 text-base md:text-lg">
-                        •
-                      </span>
-                      <span className="text-gray-300 text-base md:text-lg">
-                        {flag}
-                      </span>
+                    <li
+                      key={index}
+                      className="text-gray-300 text-base md:text-lg pl-2"
+                    >
+                      {flag}
                     </li>
                   ))}
-                </ul>
+                </ol>
               </div>
             )}
           </div>
