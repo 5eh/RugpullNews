@@ -199,7 +199,76 @@ const Navigation = () => {
         ${scrolled ? "bg-black/95 backdrop-blur-xl shadow-lg" : "bg-black/80 backdrop-blur-md"}
         lg:relative md:static`}
       >
-        {/* 1. Ticker Tracker - Dynamic Articles (TOP) */}
+        {/* 1. Crypto Prices (TOP) */}
+        <div className="border-b border-gray-700/30 overflow-x-auto">
+          <div className="max-w-7xl mx-auto px-2 md:px-4 py-1 md:py-3">
+            <div className="flex items-center justify-center space-x-3 md:space-x-6 overflow-x-auto whitespace-nowrap pb-1 w-full scrollbar-hide">
+              {["BTC", "ETH", "DOT", "DOGE"].map((symbol) => {
+                if (cryptoLoading) {
+                  return (
+                    <span
+                      key={symbol}
+                      className="inline-block text-xs md:text-sm"
+                    >
+                      {symbol}: <span className="text-gray-400">N/A</span>
+                    </span>
+                  );
+                }
+
+                const coin = cryptoPrices.find((c) => c.symbol === symbol);
+                return coin ? (
+                  <span
+                    key={coin.symbol}
+                    className="inline-block text-xs md:text-sm"
+                  >
+                    {coin.symbol}:{" "}
+                    <span className={`text-${coin.color}-400`}>
+                      {coin.formattedPrice} {coin.formattedChange}
+                    </span>
+                  </span>
+                ) : (
+                  <span
+                    key={symbol}
+                    className="inline-block text-xs md:text-sm"
+                  >
+                    {symbol}: <span className="text-gray-400">N/A</span>
+                  </span>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        {/* 2. Logo Section (MIDDLE) */}
+        <div className="border-b border-gray-700/30 py-2 md:py-4">
+          <div className="flex-grow text-center">
+            <div className="inline-flex items-center justify-center">
+              <div className="hidden lg:block w-14 h-14 overflow-hidden rounded-full mr-3">
+                <video
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="w-full h-full object-cover"
+                >
+                  <source src="/Logo.mp4" type="video/mp4" />
+                  Your browser does not support the video tag.
+                </video>
+              </div>
+              <Link
+                href="/"
+                className="text-2xl md:text-4xl lg:text-6xl font-bold font-title text-white hover:text-[#d6973e] transition-colors duration-300 inline-block"
+              >
+                RUGPULL news
+              </Link>
+            </div>
+            <p className="w-full text-center text-[#d6973e] mt-0 md:mt-2 text-[10px] md:text-sm">
+              Helping you not get rugged.
+            </p>
+          </div>
+        </div>
+
+        {/* 3. News Ticker Section (BOTTOM) */}
         <div className="border-b border-gray-700/30 overflow-hidden">
           <div className="whitespace-nowrap animate-scroll">
             <div className="inline-flex items-center space-x-4 md:space-x-8 px-4 py-1 md:py-2 text-xs md:text-sm text-gray-300">
@@ -281,75 +350,6 @@ const Navigation = () => {
           </div>
         </div>
 
-        {/* 2. Logo Section (MIDDLE) */}
-        <div className="border-b border-gray-700/30 py-2 md:py-4">
-          <div className="flex-grow text-center">
-            <div className="inline-flex items-center justify-center">
-              <div className="hidden lg:block w-14 h-14 overflow-hidden rounded-full mr-3">
-                <video
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  className="w-full h-full object-cover"
-                >
-                  <source src="/Logo.mp4" type="video/mp4" />
-                  Your browser does not support the video tag.
-                </video>
-              </div>
-              <Link
-                href="/"
-                className="text-2xl md:text-4xl lg:text-6xl font-bold font-title text-white hover:text-[#d6973e] transition-colors duration-300 inline-block"
-              >
-                RUGPULL news
-              </Link>
-            </div>
-            <p className="w-full text-center text-[#d6973e] mt-0 md:mt-2 text-[10px] md:text-sm">
-              Helping you not get rugged.
-            </p>
-          </div>
-        </div>
-
-        {/* 3. Crypto Prices Section (BOTTOM) */}
-        <div className="border-b border-gray-700/30 overflow-x-auto">
-          <div className="max-w-7xl mx-auto px-2 md:px-4 py-1 md:py-3">
-            <div className="flex items-center justify-center space-x-3 md:space-x-6 overflow-x-auto whitespace-nowrap pb-1 w-full scrollbar-hide">
-              {["BTC", "ETH", "DOT", "DOGE"].map((symbol) => {
-                if (cryptoLoading) {
-                  return (
-                    <span
-                      key={symbol}
-                      className="inline-block text-xs md:text-sm"
-                    >
-                      {symbol}: <span className="text-gray-400">N/A</span>
-                    </span>
-                  );
-                }
-
-                const coin = cryptoPrices.find((c) => c.symbol === symbol);
-                return coin ? (
-                  <span
-                    key={coin.symbol}
-                    className="inline-block text-xs md:text-sm"
-                  >
-                    {coin.symbol}:{" "}
-                    <span className={`text-${coin.color}-400`}>
-                      {coin.formattedPrice} {coin.formattedChange}
-                    </span>
-                  </span>
-                ) : (
-                  <span
-                    key={symbol}
-                    className="inline-block text-xs md:text-sm"
-                  >
-                    {symbol}: <span className="text-gray-400">N/A</span>
-                  </span>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-
         {/* Desktop Navigation Links - Only visible on desktop */}
         <div className="hidden lg:flex items-center justify-center space-x-8 py-4 border-t border-gray-700/30">
           <button className="text-gray-300 hover:text-white transition-colors duration-300">
@@ -396,12 +396,6 @@ const Navigation = () => {
             className="text-sm text-gray-300 hover:text-white transition-colors duration-300"
           >
             Content
-          </Link>
-          <Link
-            href="/safety"
-            className="text-sm text-gray-300 hover:text-white transition-colors duration-300"
-          >
-            Safety precautions
           </Link>
 
           {/* Education Dropdown */}
@@ -547,12 +541,6 @@ const Navigation = () => {
               className="text-sm text-gray-300 hover:text-white transition-colors duration-300 py-2 px-4 hover:bg-gray-800/30 rounded-sm"
             >
               Content
-            </Link>
-            <Link
-              href="/safety"
-              className="text-sm text-gray-300 hover:text-white transition-colors duration-300 py-2 px-4 hover:bg-gray-800/30 rounded-sm"
-            >
-              Safety precautions
             </Link>
 
             {/* Education links (expanded in mobile) */}

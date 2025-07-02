@@ -3,11 +3,7 @@
 import Link from "next/link";
 import React from "react";
 import Image from "next/image";
-import {
-  RiExternalLinkLine,
-  RiShareForwardLine,
-  RiArrowLeftLine,
-} from "react-icons/ri";
+import { RiExternalLinkLine, RiArrowLeftLine } from "react-icons/ri";
 
 interface ArticleData {
   id: number;
@@ -23,6 +19,17 @@ interface ArticleData {
   our_analysis: string;
   summary_analysis: string;
   banner_image: string;
+}
+
+// Type for articles in the related articles section
+interface RelatedArticle {
+  id: number | string;
+  title: string;
+  isodate: string;
+  banner_image?: string;
+  risk_level?: string;
+  creator?: string;
+  link?: string;
 }
 
 interface ProcessedArticleData {
@@ -247,9 +254,6 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           )}
 
           <div className="w-full justify-between flex flex-wrap md:flex-nowrap">
-            <div className="text-lg text-gray-300 font-title mb-4 py-2 text-left">
-              {articleData.creator} • {formatDate(articleData.publishDate)}
-            </div>
             <div
               className={`mb-4 py-1 px-3 rounded-sm font-subtitle text-sm font-medium inline-flex items-center whitespace-nowrap ${getRiskColor(articleData.riskLevel)}`}
             >
@@ -257,52 +261,34 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
             </div>
           </div>
 
-          <h1 className="text-2xl md:text-3xl font-bold font-title text-white mb-6 leading-tight max-w-4xl">
-            {articleData.title}
+          <h1 className="text-2xl md:text-3xl font-bold font-title text-white mb-4 leading-tight max-w-4xl">
+            {articleData.title
+              .split(" ")
+              .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+              .join(" ")}
           </h1>
+
+          {/* Article Summary moved to top */}
+          <p className="text-gray-300 text-base md:text-lg leading-relaxed w-full mb-6">
+            {articleData.contentSnippet}
+          </p>
         </div>
 
         {/* Content */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-12">
           {/* Main Content */}
           <div className="col-span-1 md:col-span-2">
-            <div className="bg-gray-500/5 border-gray-500/20 border rounded-lg p-4 md:p-8 mb-8">
+            <div className="bg-gray-500/5 border-gray-500/20 border rounded-lg p-4 md:p-8">
               <h2 className="text-xl md:text-2xl font-semibold font-subtitle text-white mb-4 md:mb-6">
                 Our Analysis
               </h2>
-              <div className="text-gray-300 leading-relaxed mb-8 text-base md:text-lg whitespace-pre-line max-w-prose">
+              <div className="text-gray-300 leading-relaxed mb-4 text-base md:text-lg whitespace-pre-line max-w-prose">
                 {articleData.analysis}
               </div>
-
-              <div className="bg-gray-600/30 rounded-lg p-4 md:p-6">
-                <h3 className="font-semibold text-white mb-3 md:mb-4 text-lg md:text-xl">
-                  Article Summary
-                </h3>
-                <p className="text-gray-300 text-base md:text-lg leading-relaxed max-w-prose">
-                  {articleData.contentSnippet}
-                </p>
+              <div className="text-lg text-gray-300 font-title mb-4 py-2 text-left border-t border-gray-700/30 pt-4 mt-4">
+                {articleData.creator} • {formatDate(articleData.publishDate)}
               </div>
             </div>
-
-            {/* Red Flags */}
-            {articleData.redFlags && articleData.redFlags.length > 0 && (
-              <div className="bg-gray-500/5 border-gray-500/20 border rounded-lg p-4 md:p-8">
-                <h3 className="text-xl font-semibold text-white mb-4 md:mb-6 flex items-center">
-                  <span className="text-red-400 mr-2">🚩</span> Red Flags
-                  Identified
-                </h3>
-                <ol className="space-y-3 md:space-y-4 max-w-prose list-decimal pl-5">
-                  {articleData.redFlags.map((flag, index) => (
-                    <li
-                      key={index}
-                      className="text-gray-300 text-base md:text-lg pl-2"
-                    >
-                      {flag}
-                    </li>
-                  ))}
-                </ol>
-              </div>
-            )}
           </div>
 
           {/* Sidebar */}
@@ -329,35 +315,195 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
               </div>
             </div>
 
-            {/* Quick Actions */}
-            <div className="bg-gray-500/5 border-gray-500/20 border rounded-lg p-4 md:p-8">
-              <h3 className="text-lg md:text-xl font-semibold text-white mb-4 md:mb-6">
-                Quick Actions
-              </h3>
-              <div className="space-y-3 md:space-y-4">
-                <button className="w-full bg-[#05A8DC] hover:bg-[#0494C7]  text-gray-200 py-3 md:py-4 px-4 md:px-6 rounded-sm text-base md:text-lg font-medium transition-all duration-300 flex items-center justify-center">
-                  <RiShareForwardLine className="mr-2 text-xl" /> Share Analysis
-                </button>
-                <button className="w-full bg-gray-600/40 border border-[#05A8DC] hover:bg-gray-500/60 text-gray-200 py-3 md:py-4 px-4 md:px-6 rounded-sm text-base md:text-lg font-medium transition-all duration-300">
-                  Subscribe to Updates
-                </button>
-                <button className="w-full  bg-gray-600/40 hover:bg-gray-500/60 text-white py-3 md:py-4 px-4 md:px-6 rounded-sm text-base md:text-lg font-medium transition-all duration-300">
-                  Report This Project
-                </button>
+            {/* Red Flags - Moved to sidebar */}
+            {articleData.redFlags && articleData.redFlags.length > 0 && (
+              <div className="bg-gray-500/5 border-gray-500/20 border rounded-lg p-4 md:p-8">
+                <h3 className="text-lg md:text-xl font-semibold text-white mb-4 md:mb-6 flex items-center">
+                  <span className="text-red-400 mr-2">🚩</span> Red Flags
+                  Identified
+                </h3>
+                <ol className="space-y-3 md:space-y-4 list-decimal pl-5">
+                  {articleData.redFlags.map((flag, index) => (
+                    <li
+                      key={index}
+                      className="text-gray-300 text-sm md:text-base pl-2"
+                    >
+                      {flag}
+                    </li>
+                  ))}
+                </ol>
               </div>
-            </div>
-
-            {/* Disclaimer */}
-            <div className="bg-yellow-900/30 rounded-lg p-4 md:p-6">
-              <div className="text-xs md:text-sm text-yellow-200">
-                <strong>Disclaimer:</strong> This analysis is for informational
-                purposes only and should not be considered financial advice.
-                Always conduct your own research before making investment
-                decisions.
-              </div>
-            </div>
+            )}
           </div>
         </div>
+
+        {/* Disclaimer - Moved to bottom */}
+        <div className="mt-10 bg-yellow-900/30 rounded-lg p-4 md:p-6 max-w-6xl mx-auto">
+          <div className="text-xs md:text-sm text-yellow-200">
+            <strong>Disclaimer:</strong> This analysis is for informational
+            purposes only and should not be considered financial advice. Always
+            conduct your own research before making investment decisions.
+          </div>
+        </div>
+
+        {/* Related Articles */}
+        <div className="mt-10 max-w-6xl mx-auto">
+          <h2 className="text-xl md:text-2xl font-bold text-white mb-6 font-title border-b border-gray-700/50 pb-3 flex items-center">
+            <span className="bg-[#d6973e] w-2 h-6 mr-3 rounded-sm"></span>
+            More Stories
+          </h2>
+
+          <RelatedArticles currentArticleId={articleId} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Component to fetch and display related articles
+async function RelatedArticles({
+  currentArticleId,
+}: {
+  currentArticleId: string;
+}) {
+  // Reuse the same API call as in the main page
+  async function getArticles() {
+    try {
+      const isLocalDev = process.env.NODE_ENV === "development";
+      const apiUrl = isLocalDev
+        ? "http://localhost:3000/api/all-articles?tableFilter=rugpull_context"
+        : "https://rugpullnews.org/api/all-articles?tableFilter=rugpull_context";
+
+      const response = await fetch(apiUrl, {
+        cache: "no-store",
+        headers: {
+          Accept: "application/json",
+        },
+      });
+
+      const data = await response.json();
+
+      if (data.success && data.tables && data.tables[0]?.sampleData) {
+        return { articles: data.tables[0].sampleData, error: null };
+      } else {
+        return { articles: [], error: "No articles found in API response" };
+      }
+    } catch (err) {
+      console.log(err);
+      return {
+        articles: [],
+        error: "Failed to fetch articles. Please try again later.",
+      };
+    }
+  }
+
+  const { articles, error } = await getArticles();
+
+  // Filter out current article and get enough for both sides
+  const filteredArticles = articles.filter(
+    (article: RelatedArticle) => article.id.toString() !== currentArticleId,
+  );
+
+  // Get up to 3 articles for text list on left
+  const textArticles = filteredArticles.slice(0, 3);
+
+  // Get up to 3 different articles for image cards on right
+  const imageArticles = filteredArticles.slice(3, 6);
+
+  if (error || filteredArticles.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="flex flex-col md:flex-row gap-6">
+      {/* Left side: Article titles */}
+      <div className="w-full md:w-1/3 pr-4 border-r border-gray-700/30">
+        <ul className="space-y-4">
+          {textArticles.map((article: RelatedArticle) => (
+            <li
+              key={`title-${article.id}`}
+              className="border-b border-gray-700/20 pb-3"
+            >
+              <Link href={`/${article.id}`} className="group">
+                <h3 className="font-medium text-white group-hover:text-[#d6973e] transition-colors text-base">
+                  {article.title}
+                </h3>
+                <p className="text-xs text-gray-400 mt-1">
+                  {new Date(article.isodate).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  })}
+                </p>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* Right side: Article cards with images */}
+      <div className="w-full md:w-2/3 grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {imageArticles.map((article: RelatedArticle) => (
+          <Link
+            href={`/${article.id}`}
+            key={`card-${article.id}`}
+            className="block group"
+          >
+            <div className="border border-gray-700/30 overflow-hidden transition-all duration-300 hover:bg-gray-500/10 hover:border-gray-500/30 h-full">
+              {article.banner_image && (
+                <div className="w-full h-32 relative">
+                  <Image
+                    src={article.banner_image}
+                    alt={article.title}
+                    fill
+                    style={{ objectFit: "cover" }}
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                  />
+                </div>
+              )}
+              <div className="p-3">
+                <h3 className="font-medium text-white group-hover:text-[#d6973e] transition-colors text-sm">
+                  {article.title}
+                </h3>
+                {article.risk_level && (
+                  <div
+                    className="mt-2 inline-block text-xs px-2 py-0.5 rounded font-medium whitespace-nowrap bg-opacity-20"
+                    style={{
+                      color: article.risk_level.toUpperCase().includes("HIGH")
+                        ? "#FCA5A5"
+                        : article.risk_level.toUpperCase().includes("MEDIUM")
+                          ? "#FCD34D"
+                          : article.risk_level.toUpperCase().includes("LOW")
+                            ? "#86EFAC"
+                            : "#E5E7EB",
+                      border: "1px solid",
+                      borderColor: article.risk_level
+                        .toUpperCase()
+                        .includes("HIGH")
+                        ? "rgba(220, 38, 38, 0.3)"
+                        : article.risk_level.toUpperCase().includes("MEDIUM")
+                          ? "rgba(245, 158, 11, 0.3)"
+                          : article.risk_level.toUpperCase().includes("LOW")
+                            ? "rgba(16, 185, 129, 0.3)"
+                            : "rgba(156, 163, 175, 0.3)",
+                      backgroundColor: article.risk_level
+                        .toUpperCase()
+                        .includes("HIGH")
+                        ? "rgba(220, 38, 38, 0.1)"
+                        : article.risk_level.toUpperCase().includes("MEDIUM")
+                          ? "rgba(245, 158, 11, 0.1)"
+                          : article.risk_level.toUpperCase().includes("LOW")
+                            ? "rgba(16, 185, 129, 0.1)"
+                            : "rgba(156, 163, 175, 0.1)",
+                    }}
+                  >
+                    {article.risk_level}
+                  </div>
+                )}
+              </div>
+            </div>
+          </Link>
+        ))}
       </div>
     </div>
   );

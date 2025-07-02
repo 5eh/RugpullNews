@@ -62,12 +62,6 @@ const Footer = () => {
             Content
           </Link>
           <Link
-            href="/safety"
-            className="text-gray-300 hover:text-white transition-colors duration-300"
-          >
-            Safety precautions
-          </Link>
-          <Link
             href="/education"
             className="text-gray-300 hover:text-white transition-colors duration-300"
           >
