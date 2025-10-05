@@ -1,17 +1,25 @@
-import { Pool } from "pg";
-
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-});
-
 export async function GET() {
-  const client = await pool.connect();
-
   try {
-    const result = await client.query(
-      "SELECT * FROM rugpull_context ORDER BY isodate DESC",
+    const response = await fetch(
+      "https://n8n.arthurlabs.boxgeist.com/webhook/get-articles",
     );
-    return Response.json({ success: true, data: result.rows });
+
+    if (!response.ok) {
+      throw new Error(`N8N webhook failed: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    // Format to match what Navigation expects
+    return Response.json({
+      success: true,
+      tables: [
+        {
+          name: "rugpull_context",
+          sampleData: data,
+        },
+      ],
+    });
   } catch (error) {
     return Response.json(
       {
@@ -20,7 +28,5 @@ export async function GET() {
       },
       { status: 500 },
     );
-  } finally {
-    client.release();
   }
 }

@@ -128,7 +128,6 @@ const Navigation = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // Fetch articles from API
   useEffect(() => {
     const fetchArticles = async () => {
       try {
@@ -140,13 +139,11 @@ const Navigation = () => {
         const data = await response.json();
 
         if (data.success && data.tables && data.tables.length > 0) {
-          // Find the rugpull_context table
           const rugpullTable = data.tables.find((table: { name: string }) =>
             table.name.toLowerCase().includes("rugpull_context"),
           );
 
           if (rugpullTable && rugpullTable.sampleData) {
-            // Define the type for raw article data from API
             interface RawArticleData {
               id: string | number;
               title: string;
@@ -156,7 +153,6 @@ const Navigation = () => {
               [key: string]: unknown;
             }
 
-            // Filter out articles without titles and IDs
             const validArticles = rugpullTable.sampleData
               .filter((article: RawArticleData) => article.id && article.title)
               .map(
