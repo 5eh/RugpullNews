@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-    --background: #ffffff;
+    --background: #000000;
     --foreground: #171717;
 }
 
@@ -13,6 +13,13 @@
     --font-title: var(--font-oswald);
     --font-subtitle: var(--font-lato);
     --font-content: var(--font-noto_sans_jp);
+}
+
+@media (prefers-color-scheme: light) {
+    :root {
+        --background: #0a0a0a;
+        --foreground: #ededed;
+    }
 }
 
 @media (prefers-color-scheme: dark) {
@@ -28,7 +35,6 @@ body {
     font-family: var(--font-mate), Arial, Helvetica, sans-serif;
 }
 
-/* Custom font utility classes */
 .font-title {
     font-family: var(--font-oswald);
 }

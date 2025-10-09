@@ -21,7 +21,6 @@ interface ArticleData {
   banner_image: string;
 }
 
-// Type for articles in the related articles section
 interface RelatedArticle {
   id: number | string;
   title: string;
@@ -299,7 +298,15 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                 Rug Pull Score
               </h3>
               <div className="text-center">
-                <div className="text-4xl md:text-5xl font-bold text-red-400 mb-4">
+                <div
+                  className={`text-4xl md:text-5xl font-bold mb-4 ${
+                    articleData.rugPullScore <= 2
+                      ? "text-green-400"
+                      : articleData.rugPullScore <= 6
+                        ? "text-yellow-400"
+                        : "text-red-400"
+                  }`}
+                >
                   {articleData.rugPullScore}/10
                 </div>
                 <div className="text-base md:text-lg text-gray-300">

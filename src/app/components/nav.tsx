@@ -264,7 +264,6 @@ const Navigation = () => {
           </div>
         </div>
 
-        {/* 3. News Ticker Section (BOTTOM) */}
         <div className="border-b border-gray-700/30 overflow-hidden">
           <div className="whitespace-nowrap animate-scroll">
             <div className="inline-flex items-center space-x-4 md:space-x-8 px-4 py-1 md:py-2 text-xs md:text-sm text-gray-300">
@@ -309,7 +308,6 @@ const Navigation = () => {
                       onMouseEnter={() => setHoveredArticleId(article.id)}
                       onMouseLeave={() => setHoveredArticleId(null)}
                     >
-                      {/* Icon based on article type or score */}
                       {article.rugpull_score && article.rugpull_score > 7 ? (
                         <span className="mr-1">🚨</span>
                       ) : article.red_flags ? (
