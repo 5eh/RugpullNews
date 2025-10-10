@@ -23,6 +23,7 @@ const Navigation = () => {
   const [isEducationOpen, setIsEducationOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   interface Article {
@@ -72,6 +73,17 @@ const Navigation = () => {
     if (articles.length > 3) return "30s";
     return "25s";
   }, [articles.length]);
+
+  // Detect if mobile on mount and resize
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   // Track scroll position
   useEffect(() => {
@@ -167,7 +179,7 @@ const Navigation = () => {
                   project_type: article.project_type || null,
                 }),
               )
-              .slice(0, 10); // Limit to 10 articles for performance
+              .slice(0, 10);
 
             setArticles(validArticles);
           } else {
@@ -187,19 +199,22 @@ const Navigation = () => {
     fetchArticles();
   }, []);
 
+  // Get symbols to display based on screen size
+  const getDisplaySymbols = () => {
+    return isMobile ? ["BTC", "ETH", "DOT"] : ["BTC", "ETH", "DOT", "DOGE"];
+  };
+
   return (
     <div>
-      {/* MOBILE NAVIGATION STRUCTURE */}
       <nav
         className={`fixed top-0 left-0 right-0 w-full z-50 transition-all duration-300
         ${scrolled ? "bg-black/95 backdrop-blur-xl shadow-lg" : "bg-black/80 backdrop-blur-md"}
         lg:relative md:static`}
       >
-        {/* 1. Crypto Prices (TOP) */}
         <div className="border-b border-gray-700/30 overflow-x-auto">
           <div className="max-w-7xl mx-auto px-2 md:px-4 py-1 md:py-3">
             <div className="flex items-center justify-center space-x-3 md:space-x-6 overflow-x-auto whitespace-nowrap pb-1 w-full scrollbar-hide">
-              {["BTC", "ETH", "DOT", "DOGE"].map((symbol) => {
+              {getDisplaySymbols().map((symbol) => {
                 if (cryptoLoading) {
                   return (
                     <span
