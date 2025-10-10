@@ -415,7 +415,7 @@ const Navigation = () => {
             </button>
 
             {isEducationOpen && (
-              <div className="absolute right-0 mt-2 w-64 backdrop-blur-2xl border border-gray-600/30 rounded-sm shadow-lg z-50">
+              <div className="absolute right-0 mt-2 w-64 bg-black/70 backdrop-blur-2xl border border-gray-600/30 rounded-sm shadow-lg z-50">
                 <div className="py-2">
                   <Link
                     href="/education/exit-scams"

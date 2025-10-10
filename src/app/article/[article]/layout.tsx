@@ -90,12 +90,10 @@ export async function generateMetadata(
       ? new Date(article.isodate).toISOString()
       : new Date().toISOString();
 
-    // Construct full URL for article
     const siteUrl =
       process.env.NEXT_PUBLIC_SITE_URL || "https://rugpullnews.org";
-    const articleUrl = `${siteUrl}/${articleId}`;
+    const articleUrl = `${siteUrl}/article/${articleId}`;
 
-    // Create metadata base URL safely
     let metadataBaseUrl;
     try {
       metadataBaseUrl = new URL(siteUrl);
@@ -137,7 +135,6 @@ export async function generateMetadata(
       metadataBase: metadataBaseUrl,
     };
   } catch {
-    // Fallback metadata if fetch fails
     return {
       title: "Rug Pull News | Crypto Project Analysis",
       description:

@@ -71,7 +71,7 @@ export default function ArticleCard({
           <Image
             src={
               article.banner_image ||
-              `https://www.ccn.com/wp-content/uploads/2025/03/pi-network-pi-clings-to-1-support-but-faces-pressure-ahead-of-mainnet-migration-deadline.webp`
+              `http://d8g0w48ggskw4go8k44gwo88.167.235.158.202.sslip.io/images/1749570966721.png`
             }
             alt={article.title}
             fill

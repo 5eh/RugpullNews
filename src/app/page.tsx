@@ -117,7 +117,7 @@ export default async function Home() {
                   {articles.slice(1, 6).map((article, index) => (
                     <Link
                       key={article.id}
-                      href={`/${article.id}`}
+                      href={`article/${article.id}`}
                       className="block group"
                     >
                       <div

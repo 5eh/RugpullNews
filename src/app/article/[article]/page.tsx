@@ -3,6 +3,7 @@
 import Link from "next/link";
 import React from "react";
 import Image from "next/image";
+import { notFound } from "next/navigation";
 import { RiExternalLinkLine, RiArrowLeftLine } from "react-icons/ri";
 
 interface ArticleData {
@@ -43,6 +44,7 @@ interface ProcessedArticleData {
   redFlags: string[];
   analysis: string;
   bannerImage?: string;
+  contentSnippet?: string;
 }
 
 interface ArticlePageProps {
@@ -71,7 +73,7 @@ async function getArticleData(
 
     if (!response.ok) {
       console.error(`API error: ${response.status} ${response.statusText}`);
-      throw new Error(`Failed to fetch article data: ${response.status}`);
+      return null;
     }
 
     const contentType = response.headers.get("content-type");
@@ -81,16 +83,14 @@ async function getArticleData(
         "API returned non-JSON response:",
         text.substring(0, 500) + "...",
       );
-      throw new Error(
-        `API returned non-JSON response (${contentType || "unknown content type"})`,
-      );
+      return null;
     }
 
     const data = await response.json();
 
     if (!data.success || !data.article) {
       console.warn("API returned success=false or missing article data:", data);
-      throw new Error("Article data not found");
+      return null;
     }
 
     const rawArticle: ArticleData = data.article;
@@ -161,7 +161,11 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
   const articleId = resolvedParams.article;
 
   const articleData = await getArticleData(articleId);
-  const error = articleData ? null : "Failed to load article data";
+
+  // If article not found, trigger the not-found.tsx page
+  if (!articleData) {
+    notFound();
+  }
 
   const formatDate = (isoDate: string) => {
     try {
@@ -194,28 +198,6 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
         return "text-gray-300 border border-gray-500/30";
     }
   };
-
-  if (!articleData) {
-    return (
-      <div className="min-h-screen">
-        <div className=" max-w-6xl mx-auto px-8 py-12">
-          <Link
-            href="/"
-            className="text-[#d6973e] hover:text-[#d6973e]/80 text-lg font-medium mb-6 inline-block transition-colors duration-300"
-          >
-            ← Back to Articles
-          </Link>
-
-          <div className="bg-red-900/30 rounded-lg p-8 text-white">
-            <h1 className="text-2xl font-bold mb-4">Error Loading Article</h1>
-            <p>
-              {error || "Failed to load article data. Please try again later."}
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen">
