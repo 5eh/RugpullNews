@@ -385,14 +385,7 @@ const Navigation = () => {
           >
             Safe Whistleblowing
           </Link>
-          <Link
-            href="/content"
-            className="text-sm text-gray-300 hover:text-white transition-colors duration-300"
-          >
-            Content
-          </Link>
 
-          {/* Education Dropdown */}
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setIsEducationOpen(!isEducationOpen)}
@@ -449,134 +442,89 @@ const Navigation = () => {
         </div>
       </nav>
 
-      {/* DESKTOP NAVIGATION - Moved inside nav for proper layout */}
-
-      {/* Mobile menu */}
       {isMobileMenuOpen && (
-        <div className="lg:hidden fixed top-[180px] left-0 right-0 bottom-16 bg-black/95 backdrop-blur-xl overflow-y-auto z-40 pb-10 pt-4">
-          <div className="flex flex-col space-y-4">
-            <div className="flex items-center justify-center space-x-4 mb-2 px-4">
-              <button className="text-gray-300 hover:text-white transition-colors duration-300">
-                <svg
-                  className="h-5 w-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                  />
-                </svg>
-              </button>
-              <div className="flex-1">
-                <input
-                  type="text"
-                  placeholder="Search..."
-                  className="w-full px-3 py-2 bg-gray-800/50 rounded-sm text-sm text-gray-300 focus:outline-none focus:ring-1 focus:ring-[#d6973e]"
-                />
-              </div>
-            </div>
-
-            <Link
-              href="https://arthurlabs.net"
-              className="text-sm text-gray-300 hover:text-white transition-colors duration-300 py-2 px-4 hover:bg-gray-800/30 rounded-sm"
-            >
-              Arthur Labs
-            </Link>
-
-            {/* Dynamic Articles Section */}
-            <div className="border-t border-gray-700/30 pt-3 mt-2">
-              <h4 className="px-4 text-sm font-medium text-white mb-2">
-                Latest Articles
-              </h4>
-              <div className="px-4 space-y-2">
-                {articles.slice(0, 3).map((article, index) => (
-                  <Link
-                    key={article.id || index}
-                    href={`/${article.id}`}
-                    className="block text-xs text-gray-300 hover:text-[#d6973e] py-1 border-b border-gray-700/20"
-                  >
-                    {article.title.length > 40
-                      ? `${article.title.substring(0, 37)}...`
-                      : article.title}
-                  </Link>
-                ))}
-              </div>
-            </div>
-            <Link
-              href="/sponsors"
-              className="text-sm text-gray-300 hover:text-white transition-colors duration-300 py-2 px-4 hover:bg-gray-800/30 rounded-sm"
-            >
-              Sponsors
-            </Link>
-            <Link
-              href="/submit-post"
-              className="text-sm text-gray-300 hover:text-white transition-colors duration-300 py-2 px-4 hover:bg-gray-800/30 rounded-sm"
-            >
-              Submit a post
-            </Link>
-            <Link
-              href="/submit-guide"
-              className="text-sm text-gray-300 hover:text-white transition-colors duration-300 py-2 px-4 hover:bg-gray-800/30 rounded-sm"
-            >
-              Submit a guide
-            </Link>
-            <Link
-              href="/whistleblowing"
-              className="text-sm text-gray-300 hover:text-white transition-colors duration-300 py-2 px-4 hover:bg-gray-800/30 rounded-sm"
-            >
-              Safe Whistleblowing
-            </Link>
-            <Link
-              href="/content"
-              className="text-sm text-gray-300 hover:text-white transition-colors duration-300 py-2 px-4 hover:bg-gray-800/30 rounded-sm"
-            >
-              Content
-            </Link>
-
-            {/* Education links (expanded in mobile) */}
-            <div className="border-t border-gray-700/30 pt-4 mt-2">
-              <h4 className="px-4 text-sm font-medium text-white mb-2">
-                Education
-              </h4>
-              <Link
-                href="/education/get-out-of-scam"
-                className="block px-4 py-2 text-sm text-gray-300 hover:text-white hover:bg-gray-800/30 transition-colors duration-300"
+        <div className="lg:hidden fixed left-12 right-12 bottom-20 bg-black/30 border border-gray-600 backdrop-blur-xl z-40 ">
+          <div className="flex flex-col px-4 py-3">
+            <div className="gap-3 mb-4 grid w-full">
+              <button
+                className="bg-[#d68b36] hover:bg-[#d68b36]/80 text-white px-4 py-3 rounded text-sm font-medium transition-colors duration-200 active:scale-95"
+                onClick={() => setIsMobileMenuOpen(false)}
               >
-                1. How to get out of a scam
-              </Link>
-              <Link
-                href="/education/identify-scam"
-                className="block px-4 py-2 text-sm text-gray-300 hover:text-white hover:bg-gray-800/30 transition-colors duration-300"
-              >
-                2. How to identify a scam
-              </Link>
-              <Link
-                href="/education/legal-report"
-                className="block px-4 py-2 text-sm text-gray-300 hover:text-white hover:bg-gray-800/30 transition-colors duration-300"
-              >
-                3. File a legal report
-              </Link>
-            </div>
-
-            {/* Action buttons */}
-            <div className="flex flex-col space-y-2 pt-4 mt-2 border-t border-gray-700/30 px-4">
-              <button className="bg-[#d68b36] hover:bg-[#d68b36]/80 text-white px-4 py-2 rounded-sm text-sm font-medium transition-colors duration-300">
                 Subscribe
               </button>
-              <button className="border border-[#d68b36] hover:border-[#d68b36]/80 text-gray-300 hover:text-white px-4 py-2 rounded-sm text-sm font-medium transition-colors duration-300">
+              <button
+                className="border-2 border-[#d68b36] hover:border-[#d68b36]/80 text-white hover:bg-[#d68b36]/20 px-4 py-3 rounded text-sm font-medium transition-all duration-200 active:scale-95"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
                 Donate
               </button>
+            </div>
+
+            {/* Education - Middle Section */}
+            <div className="mb-4 pb-3 border-b border-gray-700/30">
+              <h4 className="text-xs font-semibold text-[#d6973e] mb-2 uppercase tracking-wide">
+                Education
+              </h4>
+              <div className="grid grid-cols-1 gap-2">
+                <Link
+                  href="/education/exit-scams"
+                  className="block text-sm text-gray-300 hover:text-white hover:bg-[#d6973e]/50 py-2.5 px-3 rounded transition-colors active:scale-95"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Exit Scams
+                </Link>
+                <Link
+                  href="/education/identify-scams"
+                  className="block text-sm text-gray-300 hover:text-white hover:bg-[#d6973e]/50 py-2.5 px-3 rounded transition-colors active:scale-95"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Identify Scams
+                </Link>
+                <Link
+                  href="/education/report-scams"
+                  className="block text-sm text-gray-300 hover:text-white hover:bg-[#d6973e]/50 py-2.5 px-3 rounded transition-colors active:scale-95"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  File Report
+                </Link>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-1">
+              <Link
+                href="/sponsors"
+                className="text-center text-sm text-gray-300 hover:text-white bg-gray-800/30 hover:bg-gray-700/50 transition-all duration-200 py-3 px-4 rounded border border-gray-700/40 active:scale-95"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Sponsors
+              </Link>
+              <Link
+                href="/submit-post"
+                className="text-center text-sm text-gray-300 hover:text-white bg-gray-800/30 hover:bg-gray-700/50 transition-all duration-200 py-3 px-4 rounded border border-gray-700/40 active:scale-95"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Submit Post
+              </Link>
+              <Link
+                href="/submit-guide"
+                className="text-center text-sm text-gray-300 hover:text-white bg-gray-800/30 hover:bg-gray-700/50 transition-all duration-200 py-3 px-4 rounded border border-gray-700/40 active:scale-95"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Submit Guide
+              </Link>
+              <Link
+                href="/whistleblowing"
+                className="text-center text-sm text-gray-300 hover:text-white bg-gray-800/30 hover:bg-gray-700/50 transition-all duration-200 py-3 px-4 rounded border border-gray-700/40 active:scale-95"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Whistleblow
+              </Link>
             </div>
           </div>
         </div>
       )}
 
-      {/* Mobile bottom menu button */}
-      <div className="fixed bottom-0 left-0 right-0 backdrop-blur-3xl border-t border-gray-700/40 z-40 lg:hidden">
+      <div className="fixed bottom-0 left-0 right-0    z-40 lg:hidden">
         <div className="flex items-center justify-around px-2 py-3">
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -610,7 +558,7 @@ const Navigation = () => {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={2}
-                    d="M4 6h16M4 12h16m-7 6h7"
+                    d="M4 6h16M4 12h16M4 18h16"
                   />
                 </svg>
               </>

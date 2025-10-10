@@ -14,21 +14,18 @@ export const goldSponsors: Sponsor[] = [
     logoUrl: "/sponsors/Arthur_Labs_Logo.png",
     websiteUrl: "https://arthurlabs.net",
   },
+  {
+    id: 2,
+    name: "Fundora",
+    description: "A Wyoming based business loan (FACT) platform",
+    logoUrl: "/sponsors/Fundora.png",
+    websiteUrl: "https://beta.fundora.biz",
+  },
 ];
 
 export const silverSponsors: Sponsor[] = [
   {
-    id: 2,
-    name: "Crypto Analytics Partners",
-    description: "Advanced analytics for cryptocurrency markets",
-    logoUrl: "/sponsors/cap-logo.png",
-    websiteUrl: "https://example.com/cap",
-  },
-];
-
-export const bronzeSponsors: Sponsor[] = [
-  {
-    id: 4,
+    id: 3,
     name: "LifeXP",
     description:
       "Capture, verify, and showcase your most meaningful life achievements as digital proof on the blockchain.",
@@ -36,7 +33,7 @@ export const bronzeSponsors: Sponsor[] = [
     websiteUrl: "https://lifexp.world",
   },
   {
-    id: 5,
+    id: 4,
     name: "Aemula",
     description:
       "A decentralized protocol for independent journalism on a mission to reverse the trend of polarization in media.",
@@ -44,3 +41,5 @@ export const bronzeSponsors: Sponsor[] = [
     websiteUrl: "https://aemula.com",
   },
 ];
+
+export const bronzeSponsors: Sponsor[] = [];

@@ -3,7 +3,8 @@ import Loading from "../components/loading";
 import SponsorTier from "../components/SponsorTier";
 import SponsorshipPackages from "../components/SponsorshipPackages";
 import DonationForm from "../components/DonationForm";
-import { goldSponsors, silverSponsors, bronzeSponsors } from "../data/sponsors";
+import { goldSponsors, silverSponsors } from "../data/sponsors";
+// import {  bronzeSponsors } from "../data/sponsors";
 
 export default function SponsorsPage() {
   return (
@@ -38,17 +39,15 @@ export default function SponsorsPage() {
           description="Key partners who help us expand our coverage and enhance our platform."
         />
 
-        <SponsorTier
+        {/*<SponsorTier
           title="Bronze Sponsors"
           sponsors={bronzeSponsors}
           tierClass="text-amber-700"
           description="Valuable contributors who support our mission to identify and report on cryptocurrency scams."
-        />
+        />*/}
 
-        {/* Become a Sponsor CTA */}
         <SponsorshipPackages />
 
-        {/* Donation CTA */}
         <DonationForm />
       </Suspense>
     </main>
