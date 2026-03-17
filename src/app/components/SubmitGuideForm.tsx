@@ -188,15 +188,17 @@ const SubmitGuideForm: React.FC = () => {
         submitted_at: new Date().toISOString(),
       };
 
-      // In a real implementation, you would send this to your API
-      // const response = await fetch('/api/submit-guide', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(payload),
-      // });
+      const response = await fetch('/api/submit-guide', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
 
-      // Simulating successful submission for now
-      console.log("Guide submitted with:", payload);
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || "Submission failed");
+      }
 
       setSubmitStatus({
         success: true,

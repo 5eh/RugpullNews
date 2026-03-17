@@ -1,0 +1,89 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  frontend:
+    name: Frontend (Node.js)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "yarn"
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Lint
+        run: yarn lint
+
+      - name: Type check
+        run: yarn typecheck
+
+      - name: Test
+        run: yarn test
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/testdb
+          CMC_API_KEY: test-key
+          NEXT_PUBLIC_SITE_URL: https://rugpullnews.org
+
+      - name: Build
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: yarn build
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/testdb
+          CMC_API_KEY: test-key
+          NEXT_PUBLIC_SITE_URL: https://rugpullnews.org
+
+  scraper:
+    name: Scraper (Python)
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: scripts
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+          cache-dependency-path: scripts/requirements.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Lint (ruff)
+        run: |
+          pip install ruff
+          ruff check . || true
+        continue-on-error: true
+
+      - name: Test
+        run: pytest tests/ -v
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/testdb
+          ANTHROPIC_API_KEY: sk-ant-test
+          CMC_API_KEY: test-key
+          MORALIS_API_KEY: test-key
+          ETH_RPC_URL: http://localhost:8545
+          BSC_RPC_URL: http://localhost:8546
+          POLYGON_RPC_URL: http://localhost:8547

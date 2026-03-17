@@ -1,38 +1,26 @@
 @import "tailwindcss";
 
 :root {
-    --background: #000000;
-    --foreground: #171717;
+    --background: #0a0a0a;
+    --foreground: #ededed;
+    --nav-height-mobile: 180px;
+    --nav-height-tablet: 150px;
 }
 
 @theme inline {
     --color-background: var(--background);
     --color-foreground: var(--foreground);
-    --font-sans: var(--font-mate);
+    --font-sans: var(--font-lato);
     --font-mono: var(--font-geist-mono);
     --font-title: var(--font-oswald);
     --font-subtitle: var(--font-lato);
     --font-content: var(--font-noto_sans_jp);
 }
 
-@media (prefers-color-scheme: light) {
-    :root {
-        --background: #0a0a0a;
-        --foreground: #ededed;
-    }
-}
-
-@media (prefers-color-scheme: dark) {
-    :root {
-        --background: #0a0a0a;
-        --foreground: #ededed;
-    }
-}
-
 body {
     background: var(--background);
     color: var(--foreground);
-    font-family: var(--font-mate), Arial, Helvetica, sans-serif;
+    font-family: var(--font-lato), Arial, Helvetica, sans-serif;
 }
 
 .font-title {
@@ -45,4 +33,31 @@ body {
 
 .font-content {
     font-family: var(--font-noto_sans_jp);
+}
+
+/* Marquee scrolling animation for nav article ticker */
+@keyframes marquee-scroll {
+    0% {
+        transform: translateX(100%);
+    }
+    100% {
+        transform: translateX(-200%);
+    }
+}
+
+.animate-scroll {
+    animation: marquee-scroll 120s linear infinite;
+}
+
+.animate-scroll:hover {
+    animation-play-state: paused;
+}
+
+/* Hide scrollbars for clean mobile experience */
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 }

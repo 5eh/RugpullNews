@@ -39,11 +39,20 @@ export default function RootLayout({
       <body
         className={`${oswald.variable} ${lato.variable} ${noto_sans_jp.variable} antialiased`}
       >
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:px-4 focus:py-2 focus:bg-[#d6973e] focus:text-white focus:rounded"
+        >
+          Skip to main content
+        </a>
         <Navigation />
         <Analytics />
-        <div className="w-full mx-auto justify-center pt-[180px] md:pt-[150px] lg:pt-0">
+        <main
+          id="main-content"
+          className="w-full mx-auto justify-center pt-[var(--nav-height-mobile)] md:pt-[var(--nav-height-tablet)] lg:pt-0"
+        >
           {children}
-        </div>
+        </main>
         <Footer />
       </body>
     </html>

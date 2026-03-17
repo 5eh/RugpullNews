@@ -1,23 +1,44 @@
 "use client";
 
 import React, { useState } from "react";
-import { FiPlus, FiMinus, FiAlertCircle } from "react-icons/fi";
+import { useRouter } from "next/navigation";
+import { FiAlertCircle, FiSearch, FiChevronDown } from "react-icons/fi";
+
+const CHAINS = [
+  { value: "ethereum", label: "Ethereum" },
+  { value: "bsc", label: "BNB Chain (BSC)" },
+  { value: "polygon", label: "Polygon" },
+  { value: "arbitrum", label: "Arbitrum" },
+  { value: "base", label: "Base" },
+  { value: "avalanche", label: "Avalanche" },
+];
+
+// Extract address and chain from block explorer URLs
+function parseExplorerUrl(input: string): { address: string; chain: string } | null {
+  const patterns: { regex: RegExp; chain: string }[] = [
+    { regex: /etherscan\.io\/(?:token|address)\/(0x[a-fA-F0-9]{40})/, chain: "ethereum" },
+    { regex: /bscscan\.com\/(?:token|address)\/(0x[a-fA-F0-9]{40})/, chain: "bsc" },
+    { regex: /polygonscan\.com\/(?:token|address)\/(0x[a-fA-F0-9]{40})/, chain: "polygon" },
+    { regex: /arbiscan\.io\/(?:token|address)\/(0x[a-fA-F0-9]{40})/, chain: "arbitrum" },
+    { regex: /basescan\.org\/(?:token|address)\/(0x[a-fA-F0-9]{40})/, chain: "base" },
+    { regex: /snowtrace\.io\/(?:token|address)\/(0x[a-fA-F0-9]{40})/, chain: "avalanche" },
+  ];
+
+  for (const { regex, chain } of patterns) {
+    const match = input.match(regex);
+    if (match) return { address: match[1], chain };
+  }
+  return null;
+}
 
 const SubmitPostForm: React.FC = () => {
-  // Form state
-  const [formData, setFormData] = useState({
-    creator: "",
-    title: "",
-    link: "",
-    content: "",
-    contentsnippet: "",
-    risk_level: "MEDIUM RISK",
-    red_flags: [""],
-    our_analysis: "",
-    summary_analysis: "",
-  });
+  const router = useRouter();
 
-  // Form validation state
+  const [contractAddress, setContractAddress] = useState("");
+  const [chain, setChain] = useState("ethereum");
+  const [userAnalysis, setUserAnalysis] = useState("");
+  const [creator, setCreator] = useState("");
+
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitStatus, setSubmitStatus] = useState<{
     success: boolean;
@@ -25,476 +46,222 @@ const SubmitPostForm: React.FC = () => {
   } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Character limits
-  const CHARACTER_LIMITS = {
-    title: 100,
-    contentsnippet: 200,
-    summary_analysis: 500,
-  };
+  const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.trim();
 
-  // Risk level options
-  const RISK_LEVELS = ["LOW RISK", "MEDIUM RISK", "HIGH RISK"];
-
-  // Handle input changes
-  const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >,
-  ) => {
-    const { name, value } = e.target;
-
-    // For character-limited fields, restrict input
-    if (
-      CHARACTER_LIMITS[name as keyof typeof CHARACTER_LIMITS] &&
-      value.length > CHARACTER_LIMITS[name as keyof typeof CHARACTER_LIMITS]
-    ) {
-      return;
+    // Auto-detect explorer URLs
+    const parsed = parseExplorerUrl(value);
+    if (parsed) {
+      setContractAddress(parsed.address);
+      setChain(parsed.chain);
+    } else {
+      setContractAddress(value);
     }
 
-    setFormData({ ...formData, [name]: value });
-
-    // Clear error for this field if it exists
-    if (errors[name]) {
-      setErrors({ ...errors, [name]: "" });
+    if (errors.contractAddress) {
+      setErrors((prev) => ({ ...prev, contractAddress: "" }));
     }
   };
 
-  // Handle red flags changes
-  const handleRedFlagChange = (index: number, value: string) => {
-    const updatedFlags = [...formData.red_flags];
-    updatedFlags[index] = value;
-    setFormData({ ...formData, red_flags: updatedFlags });
-  };
-
-  // Add new red flag field
-  const addRedFlag = () => {
-    setFormData({
-      ...formData,
-      red_flags: [...formData.red_flags, ""],
-    });
-  };
-
-  // Remove red flag field
-  const removeRedFlag = (index: number) => {
-    if (formData.red_flags.length > 1) {
-      const updatedFlags = [...formData.red_flags];
-      updatedFlags.splice(index, 1);
-      setFormData({ ...formData, red_flags: updatedFlags });
-    }
-  };
-
-  // Generate content snippet from content if empty
-  const generateContentSnippet = () => {
-    if (formData.content && !formData.contentsnippet) {
-      const snippet = formData.content.substring(
-        0,
-        CHARACTER_LIMITS.contentsnippet,
-      );
-      setFormData({ ...formData, contentsnippet: snippet });
-    }
-  };
-
-  // Validate form
-  const validateForm = () => {
+  const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
 
-    if (!formData.creator.trim()) {
-      newErrors.creator = "Author name is required";
-    }
-
-    if (!formData.title.trim()) {
-      newErrors.title = "Title is required";
-    }
-
-    if (!formData.link.trim()) {
-      newErrors.link = "Source link is required";
-    } else if (!/^https?:\/\/.+/.test(formData.link)) {
-      newErrors.link =
-        "Please enter a valid URL starting with http:// or https://";
-    }
-
-    if (!formData.content.trim()) {
-      newErrors.content = "Content is required";
-    }
-
-    if (!formData.contentsnippet.trim()) {
-      newErrors.contentsnippet = "Content snippet is required";
-    }
-
-    if (!formData.our_analysis.trim()) {
-      newErrors.our_analysis = "Analysis is required";
-    }
-
-    if (!formData.summary_analysis.trim()) {
-      newErrors.summary_analysis = "Summary analysis is required";
-    }
-
-    // Check red flags
-    const validFlags = formData.red_flags.filter(
-      (flag) => flag.trim().length > 0,
-    );
-    if (validFlags.length === 0) {
-      newErrors.red_flags = "At least one red flag is required";
+    if (!contractAddress) {
+      newErrors.contractAddress = "Contract address is required";
+    } else if (!/^0x[a-fA-F0-9]{40}$/.test(contractAddress)) {
+      newErrors.contractAddress = "Invalid address. Must be 0x followed by 40 hex characters.";
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Pre-process the form before validation
-    generateContentSnippet();
-
-    if (!validateForm()) {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-      return;
-    }
+    if (!validateForm()) return;
 
     setIsSubmitting(true);
+    setSubmitStatus(null);
 
     try {
-      // Prepare the payload - convert red_flags to JSON string as required by the backend
-      const payload = {
-        ...formData,
-        red_flags: JSON.stringify(
-          formData.red_flags.filter((flag) => flag.trim() !== ""),
-        ),
-        // These fields will be set by the admin during approval
-        rugpull_score: 0,
-        banner_image: "",
-        // Add current date in ISO format
-        isodate: new Date().toISOString(),
-      };
+      const response = await fetch("/api/submit-post", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contract_address: contractAddress,
+          chain,
+          user_analysis: userAnalysis.slice(0, 2000),
+          creator: creator.trim() || "Community Member",
+        }),
+      });
 
-      // In a real implementation, you would send this to your API
-      // const response = await fetch('/api/submit-post', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(payload),
-      // });
+      const data = await response.json();
 
-      // const data = await response.json();
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || "Submission failed");
+      }
 
-      // Simulating successful submission for now
-      console.log("Form submitted with:", payload);
+      // Already investigated — redirect to existing article
+      if (data.existing_article_id) {
+        router.push(`/article/${data.existing_article_id}`);
+        return;
+      }
+
+      // New submission or in-progress — redirect to status page
+      if (data.submission_id) {
+        router.push(`/submit-post/status/${data.submission_id}`);
+        return;
+      }
 
       setSubmitStatus({
         success: true,
-        message:
-          "Thank you for your submission! Our team will review it shortly.",
-      });
-
-      // Reset form after successful submission
-      setFormData({
-        creator: "",
-        title: "",
-        link: "",
-        content: "",
-        contentsnippet: "",
-        risk_level: "MEDIUM RISK",
-        red_flags: [""],
-        our_analysis: "",
-        summary_analysis: "",
+        message: "Submission received. Redirecting...",
       });
     } catch (error) {
-      console.error("Error submitting form:", error);
       setSubmitStatus({
         success: false,
-        message:
-          "An error occurred while submitting your post. Please try again later.",
+        message: error instanceof Error ? error.message : "An error occurred. Please try again.",
       });
     } finally {
       setIsSubmitting(false);
-      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto">
-      {/* Status message */}
+    <div className="w-full max-w-2xl mx-auto">
       {submitStatus && (
         <div
-          className={`mb-6 p-4 rounded-lg ${submitStatus.success ? "bg-green-900/30 text-green-300 border border-green-800" : "bg-red-900/30 text-red-300 border border-red-800"}`}
+          className={`mb-6 p-4 rounded-lg ${
+            submitStatus.success
+              ? "bg-green-900/30 text-green-300 border border-green-800"
+              : "bg-red-900/30 text-red-300 border border-red-800"
+          }`}
         >
           <p className="flex items-center">
-            <FiAlertCircle className="mr-2" />
+            <FiAlertCircle className="mr-2 flex-shrink-0" />
             {submitStatus.message}
           </p>
         </div>
       )}
 
-      {/* Form errors summary */}
-      {Object.keys(errors).length > 0 && (
-        <div className="mb-6 p-4 rounded-lg bg-red-900/30 text-red-300 border border-red-800">
-          <p className="font-bold mb-2 flex items-center">
-            <FiAlertCircle className="mr-2" />
-            Please correct the following errors:
-          </p>
-          <ul className="list-disc pl-5">
-            {Object.values(errors).map((error, index) => (
-              <li key={index}>{error}</li>
-            ))}
-          </ul>
-        </div>
-      )}
-
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Author and Risk Level */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label
-              htmlFor="creator"
-              className="block text-sm font-medium text-gray-400 mb-1"
-            >
-              Author Name*
-            </label>
+        {/* Contract Address — primary field */}
+        <div>
+          <label
+            htmlFor="contractAddress"
+            className="block text-sm font-medium text-gray-400 mb-1"
+          >
+            Smart Contract Address *
+          </label>
+          <div className="relative">
+            <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
             <input
               type="text"
-              id="creator"
-              name="creator"
-              value={formData.creator}
-              onChange={handleChange}
-              className="w-full p-3 pl-8 rounded placeholder-gray-300 border hover:border-[#d6973e] border-gray-700 text-white text-lg"
-              placeholder="Your name or pseudonym"
+              id="contractAddress"
+              value={contractAddress}
+              onChange={handleAddressChange}
+              className="w-full p-3 pl-10 rounded placeholder-gray-500 border hover:border-[#d6973e] focus:border-[#d6973e] border-gray-700 bg-gray-900/50 text-white text-lg font-mono"
+              placeholder="0x... or paste Etherscan/BSCScan URL"
+              spellCheck={false}
+              autoComplete="off"
             />
-            {errors.creator && (
-              <p className="mt-1 text-sm text-red-500">{errors.creator}</p>
-            )}
           </div>
+          {errors.contractAddress && (
+            <p className="mt-1 text-sm text-red-500">{errors.contractAddress}</p>
+          )}
+          <p className="mt-1 text-xs text-gray-500">
+            Paste a contract address or block explorer URL — chain is auto-detected from URLs
+          </p>
+        </div>
 
-          <div>
-            <label
-              htmlFor="risk_level"
-              className="block text-sm font-medium text-gray-400 mb-1"
-            >
-              Risk Level*
-            </label>
+        {/* Chain selector */}
+        <div>
+          <label
+            htmlFor="chain"
+            className="block text-sm font-medium text-gray-400 mb-1"
+          >
+            Blockchain Network
+          </label>
+          <div className="relative">
             <select
-              id="risk_level"
-              name="risk_level"
-              value={formData.risk_level}
-              onChange={handleChange}
-              className="w-full p-3 pl-8 rounded placeholder-gray-300 border hover:border-[#d6973e] border-gray-700 text-white text-lg"
+              id="chain"
+              value={chain}
+              onChange={(e) => setChain(e.target.value)}
+              className="w-full p-3 pr-10 rounded border hover:border-[#d6973e] focus:border-[#d6973e] border-gray-700 bg-gray-900/50 text-white text-lg appearance-none"
             >
-              {RISK_LEVELS.map((level) => (
-                <option key={level} value={level}>
-                  {level}
+              {CHAINS.map((c) => (
+                <option key={c.value} value={c.value}>
+                  {c.label}
                 </option>
               ))}
             </select>
+            <FiChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
           </div>
         </div>
 
-        {/* Title */}
+        {/* User analysis — optional */}
         <div>
           <label
-            htmlFor="title"
+            htmlFor="userAnalysis"
             className="block text-sm font-medium text-gray-400 mb-1"
           >
-            Title*{" "}
+            Your Analysis{" "}
             <span className="text-xs text-gray-500">
-              ({formData.title.length}/{CHARACTER_LIMITS.title} characters)
+              (optional — {userAnalysis.length}/2000)
             </span>
+          </label>
+          <textarea
+            id="userAnalysis"
+            value={userAnalysis}
+            onChange={(e) => setUserAnalysis(e.target.value.slice(0, 2000))}
+            className="w-full p-3 rounded placeholder-gray-500 border hover:border-[#d6973e] focus:border-[#d6973e] border-gray-700 bg-gray-900/50 text-white text-base"
+            placeholder="What looks suspicious about this contract? Any context helps our AI investigation."
+            rows={4}
+          />
+        </div>
+
+        {/* Creator name — optional */}
+        <div>
+          <label
+            htmlFor="creator"
+            className="block text-sm font-medium text-gray-400 mb-1"
+          >
+            Your Name{" "}
+            <span className="text-xs text-gray-500">(optional)</span>
           </label>
           <input
             type="text"
-            id="title"
-            name="title"
-            value={formData.title}
-            onChange={handleChange}
-            className="w-full p-3 pl-8 rounded placeholder-gray-300 border hover:border-[#d6973e] border-gray-700 text-white text-lg"
-            placeholder="Title of the report"
-            maxLength={CHARACTER_LIMITS.title}
+            id="creator"
+            value={creator}
+            onChange={(e) => setCreator(e.target.value.slice(0, 50))}
+            className="w-full p-3 rounded placeholder-gray-500 border hover:border-[#d6973e] focus:border-[#d6973e] border-gray-700 bg-gray-900/50 text-white text-lg"
+            placeholder="Community Member"
           />
-          {errors.title && (
-            <p className="mt-1 text-sm text-red-500">{errors.title}</p>
-          )}
         </div>
 
-        {/* Source Link */}
-        <div>
-          <label
-            htmlFor="link"
-            className="block text-sm font-medium text-gray-400 mb-1"
-          >
-            Source Link*
-          </label>
-          <input
-            type="url"
-            id="link"
-            name="link"
-            value={formData.link}
-            onChange={handleChange}
-            className="w-full p-3 pl-8 rounded placeholder-gray-300 border hover:border-[#d6973e] border-gray-700 text-white text-lg"
-            placeholder="https://example.com/news-article"
-          />
-          {errors.link && (
-            <p className="mt-1 text-sm text-red-500">{errors.link}</p>
-          )}
-        </div>
-
-        {/* Full Content */}
-        <div>
-          <label
-            htmlFor="content"
-            className="block text-sm font-medium text-gray-400 mb-1"
-          >
-            Full Content*
-          </label>
-          <textarea
-            id="content"
-            name="content"
-            value={formData.content}
-            onChange={handleChange}
-            onBlur={generateContentSnippet}
-            className="w-full p-3 pl-8 rounded placeholder-gray-300 border hover:border-[#d6973e] border-gray-700 text-white text-lg"
-            placeholder="Full content of the article or report"
-            rows={5}
-          />
-          {errors.content && (
-            <p className="mt-1 text-sm text-red-500">{errors.content}</p>
-          )}
-        </div>
-
-        {/* Content Snippet */}
-        <div>
-          <label
-            htmlFor="contentsnippet"
-            className="block text-sm font-medium text-gray-400 mb-1"
-          >
-            Content Snippet*{" "}
-            <span className="text-xs text-gray-500">
-              ({formData.contentsnippet.length}/
-              {CHARACTER_LIMITS.contentsnippet} characters)
-            </span>
-          </label>
-          <textarea
-            id="contentsnippet"
-            name="contentsnippet"
-            value={formData.contentsnippet}
-            onChange={handleChange}
-            className="w-full p-3 pl-8 rounded placeholder-gray-300 border hover:border-[#d6973e] border-gray-700 text-white text-lg"
-            placeholder="Brief summary of the content (will be automatically generated if left empty)"
-            rows={2}
-            maxLength={CHARACTER_LIMITS.contentsnippet}
-          />
-          {errors.contentsnippet && (
-            <p className="mt-1 text-sm text-red-500">{errors.contentsnippet}</p>
-          )}
-          <p className="text-sm text-center mt-6 text-gray-500">
-            This will be displayed in article cards and previews.
-          </p>
-        </div>
-
-        {/* Red Flags */}
-        <div>
-          <label className="block text-sm font-medium text-gray-400 mb-1">
-            Red Flags*{" "}
-            <span className="text-xs text-gray-500">
-              (List specific warning signs or concerns)
-            </span>
-          </label>
-          {errors.red_flags && (
-            <p className="mt-1 text-sm text-red-500">{errors.red_flags}</p>
-          )}
-
-          <div className="space-y-3">
-            {formData.red_flags.map((flag, index) => (
-              <div key={index} className="flex items-center space-x-2">
-                <input
-                  type="text"
-                  value={flag}
-                  onChange={(e) => handleRedFlagChange(index, e.target.value)}
-                  className="flex-1 p-3 pl-8 rounded placeholder-gray-300 border hover:border-[#d6973e] border-gray-700 text-white text-lg"
-                  placeholder="e.g., Anonymous team with no public identities"
-                />
-                <button
-                  type="button"
-                  onClick={() => removeRedFlag(index)}
-                  className="p-2 bg-red-900/30 text-red-300 rounded hover:bg-red-900/50 transition-colors"
-                  disabled={formData.red_flags.length <= 1}
-                >
-                  <FiMinus />
-                </button>
-              </div>
-            ))}
-
-            <button
-              type="button"
-              onClick={addRedFlag}
-              className="flex items-center space-x-2 p-2 bg-gray-800/50 hover:bg-gray-700/50 rounded text-gray-300 transition-colors"
-            >
-              <FiPlus /> <span>Add Another Red Flag</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Our Analysis */}
-        <div>
-          <label
-            htmlFor="our_analysis"
-            className="block text-sm font-medium text-gray-400 mb-1"
-          >
-            Detailed Analysis*
-          </label>
-          <textarea
-            id="our_analysis"
-            name="our_analysis"
-            value={formData.our_analysis}
-            onChange={handleChange}
-            className="w-full p-3 pl-8 rounded placeholder-gray-300 border hover:border-[#d6973e] border-gray-700 text-white text-lg"
-            placeholder="Provide a detailed analysis of the situation, including context, technical details, and impact"
-            rows={8}
-          />
-          {errors.our_analysis && (
-            <p className="mt-1 text-sm text-red-500">{errors.our_analysis}</p>
-          )}
-        </div>
-
-        {/* Summary Analysis */}
-        <div>
-          <label
-            htmlFor="summary_analysis"
-            className="block text-sm font-medium text-gray-400 mb-1"
-          >
-            Summary Analysis*{" "}
-            <span className="text-xs text-gray-500">
-              ({formData.summary_analysis.length}/
-              {CHARACTER_LIMITS.summary_analysis} characters)
-            </span>
-          </label>
-          <textarea
-            id="summary_analysis"
-            name="summary_analysis"
-            value={formData.summary_analysis}
-            onChange={handleChange}
-            className="w-full p-3 pl-8 rounded placeholder-gray-300 border hover:border-[#d6973e] border-gray-700 text-white text-lg"
-            placeholder="Concise summary of your analysis"
-            rows={4}
-            maxLength={CHARACTER_LIMITS.summary_analysis}
-          />
-          {errors.summary_analysis && (
-            <p className="mt-1 text-sm text-red-500">
-              {errors.summary_analysis}
-            </p>
-          )}
-        </div>
-
-        {/* Submit Button */}
-        <div className="pt-4">
+        {/* Submit */}
+        <div className="pt-2">
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full py-4 bg-gray-800 hover:bg-gray-700 rounded font-medium text-white transition-all duration-300 text-lg"
+            className="w-full py-4 bg-[#d6973e] hover:bg-[#c4872e] disabled:bg-gray-700 disabled:cursor-not-allowed rounded font-bold text-white transition-all duration-300 text-lg"
           >
-            {isSubmitting ? "Submitting..." : "Submit post for review ✅"}
+            {isSubmitting ? (
+              <span className="flex items-center justify-center">
+                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+                Submitting...
+              </span>
+            ) : (
+              "Investigate Contract"
+            )}
           </button>
-          <p className="text-sm text-center mt-6 text-gray-500">
-            All submissions are reviewed by our team before publishing. We
-            typically respond within 48 hours.
+          <p className="text-sm text-center mt-4 text-gray-500">
+            Our system will automatically analyze on-chain data, scrape community sentiment,
+            and generate an investigation report. This typically takes 1-2 minutes.
           </p>
         </div>
       </form>

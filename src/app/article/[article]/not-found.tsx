@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { RiArrowLeftLine, RiErrorWarningLine } from "react-icons/ri";
+import { getRiskLevelClass, formatArticleDate } from "@/app/lib/utils";
 
 interface Article {
   id: number;
@@ -9,8 +10,8 @@ interface Article {
   link: string;
   isodate: string;
   contentsnippet: string;
-  banner_image?: string;
-  risk_level?: string;
+  banner_image?: string | null;
+  risk_level?: string | null;
 }
 
 async function getRelatedArticles() {
@@ -39,42 +40,12 @@ async function getRelatedArticles() {
   }
 }
 
-const getRiskLevelClass = (level?: string): string => {
-  if (!level) return "text-gray-200 bg-gray-800/50 border border-gray-500/30";
-
-  const levelUpper = level.toUpperCase();
-
-  if (levelUpper.includes("HIGH")) {
-    return "text-red-300 bg-red-900/20 border border-red-500/30";
-  } else if (levelUpper.includes("MEDIUM")) {
-    return "text-yellow-300 bg-yellow-900/20 border border-yellow-500/30";
-  } else if (levelUpper.includes("LOW")) {
-    return "text-green-300 bg-green-900/20 border border-green-500/30";
-  }
-
-  return "text-gray-200 bg-gray-800/50 border border-gray-500/30";
-};
-
-const formatDate = (isoDate: string) => {
-  try {
-    return new Date(isoDate).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
-  } catch (e) {
-    console.log(e);
-    return "Unknown Date";
-  }
-};
-
 export default async function ArticleNotFound() {
   const relatedArticles = await getRelatedArticles();
 
   return (
     <div className="min-h-screen">
       <div className="max-w-6xl mx-auto px-8 py-8">
-        {/* Compact Error Message */}
         <div className="mb-8">
           <Link
             href="/"
@@ -99,7 +70,6 @@ export default async function ArticleNotFound() {
           </div>
         </div>
 
-        {/* Related Articles Section */}
         {relatedArticles.length > 0 && (
           <div>
             <h2 className="text-2xl md:text-3xl font-bold text-white mb-6 font-title border-b border-gray-700/50 pb-3 flex items-center">
@@ -110,7 +80,7 @@ export default async function ArticleNotFound() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {relatedArticles.map((article: Article) => (
                 <Link
-                  href={`/${article.id}`}
+                  href={`/article/${article.id}`}
                   key={article.id}
                   className="block group"
                 >
@@ -131,12 +101,10 @@ export default async function ArticleNotFound() {
                       <div className="flex items-center justify-between gap-2 mb-3">
                         <div className="text-xs text-gray-400 truncate">
                           {article.creator || "ANON"} •{" "}
-                          {formatDate(article.isodate)}
+                          {formatArticleDate(article.isodate)}
                         </div>
                         {article.risk_level && (
-                          <div
-                            className={`${getRiskLevelClass(article.risk_level)} text-xs px-2 py-1 rounded font-medium whitespace-nowrap`}
-                          >
+                          <div className={getRiskLevelClass(article.risk_level)}>
                             {article.risk_level}
                           </div>
                         )}
@@ -160,7 +128,6 @@ export default async function ArticleNotFound() {
           </div>
         )}
 
-        {/* Fallback if no articles */}
         {relatedArticles.length === 0 && (
           <div className="text-center py-12">
             <p className="text-gray-400 mb-6">

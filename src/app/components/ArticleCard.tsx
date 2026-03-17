@@ -3,46 +3,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { RiExternalLinkLine } from "react-icons/ri";
+import { Article } from "@/app/lib/types";
+import { getRiskLevelClass, formatArticleDate } from "@/app/lib/utils";
 
-interface Article {
-  id: number;
-  creator: string;
-  title: string;
-  link: string;
-  pubdate: string;
-  content: string;
-  contentsnippet: string;
-  guid: string;
-  isodate: string;
-  banner_image?: string;
-  risk_level?: string;
-  rugpull_score?: number;
-}
-
-const formatDate = (isoDate: string) => {
-  return new Date(isoDate).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
-};
-
-const getRiskLevelClass = (level?: string): string => {
-  if (!level)
-    return "text-gray-200 bg-gray-800/50 border border-gray-500/30 text-xs px-2 py-1 rounded font-medium whitespace-nowrap";
-
-  const levelUpper = level.toUpperCase();
-
-  if (levelUpper.includes("HIGH")) {
-    return "text-red-300 bg-red-900/20 border border-red-500/30 text-xs px-2 py-1 rounded font-medium whitespace-nowrap";
-  } else if (levelUpper.includes("MEDIUM")) {
-    return "text-yellow-300 bg-yellow-900/20 border border-yellow-500/30 text-xs px-2 py-1 rounded font-medium whitespace-nowrap";
-  } else if (levelUpper.includes("LOW")) {
-    return "text-green-300 bg-green-900/20 border border-green-500/30 text-xs px-2 py-1 rounded font-medium whitespace-nowrap";
-  }
-
-  return "text-gray-200 bg-gray-800/50 border border-gray-500/30 text-xs px-2 py-1 rounded font-medium whitespace-nowrap";
-};
+const FALLBACK_IMAGE = "/images/article-fallback.png";
 
 interface ArticleCardProps {
   article: Article;
@@ -60,7 +24,7 @@ export default function ArticleCard({
     <div
       className={`group flex flex-col justify-between transition-all duration-300 hover:bg-gray-500/5 hover:border-gray-500/20  overflow-hidden border border-gray-700/30 h-full ${className}`}
     >
-      <Link href={`/${article.id}`} className="block">
+      <Link href={`/article/${article.id}`} className="block">
         <div
           className={`${
             featured
@@ -69,10 +33,7 @@ export default function ArticleCard({
           } w-full overflow-hidden relative group-hover:shadow-md transition-all`}
         >
           <Image
-            src={
-              article.banner_image ||
-              `http://d8g0w48ggskw4go8k44gwo88.167.235.158.202.sslip.io/images/1749570966721.png`
-            }
+            src={article.banner_image || FALLBACK_IMAGE}
             alt={article.title}
             fill
             sizes={
@@ -81,7 +42,7 @@ export default function ArticleCard({
                 : "(max-width: 768px) 100vw, 33vw"
             }
             style={{ objectFit: "cover", objectPosition: "center" }}
-            className="transition-all duration-300 w-full h-full hover:scale-105"
+            className="transition-all duration-300 w-full h-full hover:scale-105 grayscale-[70%] group-hover:grayscale-0"
           />
         </div>
       </Link>
@@ -94,13 +55,13 @@ export default function ArticleCard({
               {(article.creator?.length || 0) <= 35 && (
                 <span className="hidden md:inline">
                   {" "}
-                  • {formatDate(article.isodate)}
+                  • {formatArticleDate(article.isodate)}
                 </span>
               )}
             </div>
             <div className="block">
               {article.risk_level && (
-                <div className={`${getRiskLevelClass(article.risk_level)}`}>
+                <div className={getRiskLevelClass(article.risk_level)}>
                   {article.risk_level}
                 </div>
               )}
@@ -108,7 +69,7 @@ export default function ArticleCard({
           </div>
 
           <Link
-            href={`/${article.id}`}
+            href={`/article/${article.id}`}
             className="group-hover:text-[#d6973e] transition-colors duration-300 block"
           >
             <h3
@@ -140,7 +101,7 @@ export default function ArticleCard({
               </a>
             </div>
             <Link
-              href={`/${article.id}`}
+              href={`/article/${article.id}`}
               className="text-xs sm:text-sm font-title text-[#d6973e] hover:text-[#d68b36] transition-colors duration-300 font-medium"
             >
               Our Report

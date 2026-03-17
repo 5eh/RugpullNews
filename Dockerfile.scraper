@@ -1,0 +1,20 @@
+FROM python:3.12-slim
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends cron curl && \
+    rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app/scripts
+
+COPY scripts/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY scripts/ .
+
+# Set up cron job - daily at 06:00 UTC
+RUN echo "0 6 * * * cd /app/scripts && /usr/local/bin/python3 main.py >> /var/log/scraper.log 2>&1" > /etc/cron.d/scraper && \
+    chmod 0644 /etc/cron.d/scraper && \
+    crontab /etc/cron.d/scraper && \
+    touch /var/log/scraper.log
+
+CMD ["sh", "-c", "printenv > /etc/environment && cron && tail -f /var/log/scraper.log"]

@@ -1,70 +1,40 @@
-import { NextResponse } from "next/server";
+import { queryOne } from "@/app/lib/db";
+import { Article } from "@/app/lib/types";
+import { apiError, validateNumericId } from "@/app/lib/security";
 
-interface Article {
-  id: number;
-  creator: string;
-  title: string;
-  link: string;
-  pubdate: string;
-  dc_creator: string;
-  content: string;
-  contentsnippet: string;
-  guid: string;
-  isodate: string;
-  risk_level: string | null;
-  rugpull_score: number;
-  red_flags: string | null;
-  our_analysis: string | null;
-  summary_analysis: string | null;
-  banner_image: string | null;
-}
-
-export async function GET(request: Request): Promise<NextResponse> {
+export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const id = searchParams.get("id");
+  const rawId = searchParams.get("id");
 
-  if (!id) {
-    return NextResponse.json(
-      { success: false, error: "Article ID is required" },
-      { status: 400 },
-    );
+  const result = validateNumericId(rawId, "id");
+  if (result.error) {
+    return apiError("Valid article ID is required", 400);
   }
 
   try {
-    const response = await fetch(
-      "https://n8n.arthurlabs.boxgeist.com/webhook/get-articles",
+    const article = await queryOne<Article>(
+      `SELECT id, creator, title, link, pubdate, dc_creator, content,
+              contentsnippet, guid, isodate, risk_level, rugpull_score,
+              red_flags, our_analysis, summary_analysis, banner_image,
+              article_type, investigated_address, investigated_chain, price_drop_pct
+       FROM articles
+       WHERE id = $1 AND published = true`,
+      [result.parsed],
+    );
+
+    if (!article) {
+      return apiError("Article not found", 404);
+    }
+
+    return Response.json(
+      { success: true, article },
       {
-        cache: "no-store",
         headers: {
-          Accept: "application/json",
+          "Cache-Control": "public, s-maxage=300, stale-while-revalidate=60",
         },
       },
     );
-
-    if (!response.ok) {
-      throw new Error(`N8N webhook failed: ${response.status}`);
-    }
-
-    const articles: Article[] = await response.json();
-
-    const article = articles.find((a) => String(a.id) === id);
-
-    if (!article) {
-      return NextResponse.json(
-        { success: false, error: "Article not found" },
-        { status: 404 },
-      );
-    }
-
-    return NextResponse.json({ success: true, article });
   } catch (error) {
-    console.error("API error:", error);
-    return NextResponse.json(
-      {
-        success: false,
-        error: error instanceof Error ? error.message : "Unknown error",
-      },
-      { status: 500 },
-    );
+    return apiError("Failed to fetch article", 500, error);
   }
 }

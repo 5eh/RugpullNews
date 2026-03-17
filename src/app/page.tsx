@@ -2,21 +2,7 @@ import { Suspense } from "react";
 import Loading from "./components/loading";
 import ArticleCard from "./components/ArticleCard";
 import Link from "next/link";
-
-interface Article {
-  id: number;
-  creator: string;
-  title: string;
-  link: string;
-  pubdate: string;
-  content: string;
-  contentsnippet: string;
-  guid: string;
-  isodate: string;
-  banner_image?: string;
-  risk_level?: string;
-  rugpull_score?: number;
-}
+import { Article } from "@/app/lib/types";
 
 type ArticleResponse = {
   success: boolean;
@@ -117,7 +103,7 @@ export default async function Home() {
                   {articles.slice(1, 6).map((article, index) => (
                     <Link
                       key={article.id}
-                      href={`article/${article.id}`}
+                      href={`/article/${article.id}`}
                       className="block group"
                     >
                       <div

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { RiArrowLeftLine, RiErrorWarningLine } from "react-icons/ri";
+import { getRiskLevelClass } from "@/app/lib/utils";
 
 interface Article {
   id: number;
@@ -9,8 +10,8 @@ interface Article {
   link: string;
   isodate: string;
   contentsnippet: string;
-  banner_image?: string;
-  risk_level?: string;
+  banner_image?: string | null;
+  risk_level?: string | null;
 }
 
 async function getSuggestedArticles() {
@@ -38,22 +39,6 @@ async function getSuggestedArticles() {
     return [];
   }
 }
-
-const getRiskLevelClass = (level?: string): string => {
-  if (!level) return "text-gray-200 bg-gray-800/50 border border-gray-500/30";
-
-  const levelUpper = level.toUpperCase();
-
-  if (levelUpper.includes("HIGH")) {
-    return "text-red-300 bg-red-900/20 border border-red-500/30";
-  } else if (levelUpper.includes("MEDIUM")) {
-    return "text-yellow-300 bg-yellow-900/20 border border-yellow-500/30";
-  } else if (levelUpper.includes("LOW")) {
-    return "text-green-300 bg-green-900/20 border border-green-500/30";
-  }
-
-  return "text-gray-200 bg-gray-800/50 border border-gray-500/30";
-};
 
 export default async function NotFound() {
   const suggestedArticles = await getSuggestedArticles();
@@ -87,7 +72,6 @@ export default async function NotFound() {
             </Link>
           </div>
 
-          {/* Additional Help */}
           <div className="mt-8 pt-6 border-t border-gray-700/30">
             <p className="text-sm text-gray-400">
               Looking for something specific?{" "}
@@ -101,7 +85,6 @@ export default async function NotFound() {
           </div>
         </div>
 
-        {/* Suggested Stories */}
         {suggestedArticles.length > 0 && (
           <div className="mt-12">
             <h2 className="text-xl md:text-2xl font-bold text-white mb-6 font-title border-b border-gray-700/50 pb-3 flex items-center">
@@ -112,7 +95,7 @@ export default async function NotFound() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {suggestedArticles.map((article: Article) => (
                 <Link
-                  href={`/${article.id}`}
+                  href={`/article/${article.id}`}
                   key={article.id}
                   className="block group"
                 >
@@ -134,9 +117,7 @@ export default async function NotFound() {
                           {article.creator || "ANON"}
                         </div>
                         {article.risk_level && (
-                          <div
-                            className={`${getRiskLevelClass(article.risk_level)} text-xs px-2 py-1 rounded font-medium whitespace-nowrap`}
-                          >
+                          <div className={getRiskLevelClass(article.risk_level)}>
                             {article.risk_level}
                           </div>
                         )}

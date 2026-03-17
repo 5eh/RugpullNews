@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: "standalone",
   images: {
     remotePatterns: [
       {
@@ -22,11 +23,6 @@ const nextConfig = {
       {
         protocol: "https",
         hostname: "crypto.news",
-        pathname: "/**",
-      },
-      {
-        protocol: "https",
-        hostname: "**",
         pathname: "/**",
       },
     ],
